@@ -1,0 +1,4 @@
+node_modules/
+db/snacks.db
+uploads/
+.claude/

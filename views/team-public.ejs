@@ -1,0 +1,50 @@
+<% const title = team.name; %>
+<%- include('layout') %>
+
+<div class="public-team">
+  <% if (team.logo_path) { %>
+    <div class="logo-center">
+      <img src="<%= team.logo_path %>" alt="<%= team.name %> logo" class="team-logo-large">
+    </div>
+  <% } %>
+  <h1 class="text-center"><%= team.name %></h1>
+
+  <% if (success) { %>
+    <div class="success-msg">Thanks for signing up to bring snacks!</div>
+  <% } %>
+
+  <% if (games.length === 0) { %>
+    <p class="muted text-center">No games scheduled yet. Check back soon!</p>
+  <% } else { %>
+    <% for (const game of games) { %>
+      <div class="card game-card">
+        <div class="game-info">
+          <h3>
+            <%= game.game_date %> at <%= game.game_time %>
+            <span class="badge badge-<%= game.home_away %>"><%= game.home_away === 'home' ? 'Home' : 'Away' %></span>
+          </h3>
+          <% if (game.field_number) { %>
+            <p class="muted">Field <%= game.field_number %></p>
+          <% } %>
+        </div>
+
+        <% if (game.signups.length > 0) { %>
+          <div class="signups-list">
+            <h4>Signed up:</h4>
+            <p><strong><%= game.signups[0].parent_name %></strong></p>
+          </div>
+        <% } else { %>
+          <form method="POST" action="/team/<%= team.slug %>/signup" class="signup-form">
+            <input type="hidden" name="game_id" value="<%= game.id %>">
+            <div class="form-row">
+              <input type="text" name="parent_name" placeholder="Your name" required>
+              <button type="submit" class="btn btn-primary">Sign Up</button>
+            </div>
+          </form>
+        <% } %>
+      </div>
+    <% } %>
+  <% } %>
+</div>
+
+<%- include('footer') %>

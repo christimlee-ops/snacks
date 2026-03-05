@@ -1,0 +1,18 @@
+<% const title = 'Login'; %>
+<%- include('layout') %>
+
+<div class="card login-card">
+  <h1>Admin Login</h1>
+  <% if (error) { %>
+    <p class="error"><%= error %></p>
+  <% } %>
+  <form method="POST" action="/login">
+    <label for="username">Username</label>
+    <input type="text" id="username" name="username" required autofocus>
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" required>
+    <button type="submit" class="btn btn-primary">Log In</button>
+  </form>
+</div>
+
+<%- include('footer') %>

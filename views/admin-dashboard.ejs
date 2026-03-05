@@ -1,0 +1,33 @@
+<% const title = 'Dashboard'; %>
+<%- include('layout') %>
+
+<h1>Teams</h1>
+
+<div class="card">
+  <h2>Create a Team</h2>
+  <form method="POST" action="/admin/teams" class="inline-form">
+    <input type="text" name="name" placeholder="Team name (e.g. Dragons 67)" required>
+    <button type="submit" class="btn btn-primary">Create</button>
+  </form>
+</div>
+
+<% if (teams.length === 0) { %>
+  <p class="muted">No teams yet. Create one above!</p>
+<% } else { %>
+  <div class="team-grid">
+    <% for (const team of teams) { %>
+      <div class="card team-card">
+        <% if (team.logo_path) { %>
+          <img src="<%= team.logo_path %>" alt="<%= team.name %> logo" class="team-logo-small">
+        <% } %>
+        <h3><%= team.name %></h3>
+        <div class="team-card-links">
+          <a href="/admin/teams/<%= team.slug %>" class="btn btn-small">Manage</a>
+          <a href="/team/<%= team.slug %>" class="btn btn-small btn-outline" target="_blank">Public Page</a>
+        </div>
+      </div>
+    <% } %>
+  </div>
+<% } %>
+
+<%- include('footer') %>

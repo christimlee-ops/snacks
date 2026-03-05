@@ -1,0 +1,22 @@
+<% const title = 'Home'; %>
+<%- include('layout') %>
+
+<h1 class="text-center">Snack Signup</h1>
+<p class="text-center muted" style="margin-bottom:1.5rem;">Pick your team to view the schedule and sign up to bring snacks!</p>
+
+<% if (teams.length === 0) { %>
+  <p class="text-center muted">No teams yet. Check back soon!</p>
+<% } else { %>
+  <div class="team-grid">
+    <% for (const team of teams) { %>
+      <a href="/team/<%= team.slug %>" class="card team-card team-card-link">
+        <% if (team.logo_path) { %>
+          <img src="<%= team.logo_path %>" alt="<%= team.name %> logo" class="team-logo-small">
+        <% } %>
+        <h3><%= team.name %></h3>
+      </a>
+    <% } %>
+  </div>
+<% } %>
+
+<%- include('footer') %>

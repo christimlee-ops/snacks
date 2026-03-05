@@ -1,0 +1,113 @@
+<% const title = team.name; %>
+<%- include('layout') %>
+
+<a href="/admin" class="back-link">&larr; All Teams</a>
+
+<div class="team-header">
+  <% if (team.logo_path) { %>
+    <img src="<%= team.logo_path %>" alt="<%= team.name %> logo" class="team-logo">
+  <% } %>
+  <h1><%= team.name %></h1>
+  <p class="muted">Public URL: <a href="/team/<%= team.slug %>" target="_blank">/team/<%= team.slug %></a></p>
+</div>
+
+<div class="card">
+  <h2>Upload Logo</h2>
+  <form method="POST" action="/admin/teams/<%= team.slug %>/logo" enctype="multipart/form-data" class="inline-form">
+    <input type="file" name="logo" accept="image/*" required>
+    <button type="submit" class="btn btn-primary">Upload</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>Add Game</h2>
+  <form method="POST" action="/admin/teams/<%= team.slug %>/games" class="game-form">
+    <div class="form-row">
+      <div class="form-group">
+        <label for="game_date">Date</label>
+        <input type="date" id="game_date" name="game_date" required>
+      </div>
+      <div class="form-group">
+        <label for="game_time">Time</label>
+        <input type="time" id="game_time" name="game_time" required>
+      </div>
+      <div class="form-group">
+        <label for="home_away">Home/Away</label>
+        <select id="home_away" name="home_away" required>
+          <option value="home">Home</option>
+          <option value="away">Away</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="field_number">Field #</label>
+        <input type="text" id="field_number" name="field_number" placeholder="e.g. 3">
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Add Game</button>
+  </form>
+</div>
+
+<h2>Games</h2>
+<% if (games.length === 0) { %>
+  <p class="muted">No games yet. Add one above!</p>
+<% } else { %>
+  <table class="games-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Home/Away</th>
+        <th>Field</th>
+        <th>Signups</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% for (const game of games) { %>
+        <tr>
+          <td><%= game.game_date %></td>
+          <td><%= game.game_time %></td>
+          <td><%= game.home_away === 'home' ? 'Home' : 'Away' %></td>
+          <td><%= game.field_number || '—' %></td>
+          <td><%= game.signup_count %></td>
+          <td style="white-space:nowrap">
+            <button type="button" class="btn btn-small btn-outline" onclick="document.getElementById('edit-<%= game.id %>').toggleAttribute('hidden')">Edit</button>
+            <form method="POST" action="/admin/teams/<%= team.slug %>/games/<%= game.id %>/delete" style="display:inline">
+              <button type="submit" class="btn btn-small btn-danger" onclick="return confirm('Delete this game?')">Delete</button>
+            </form>
+          </td>
+        </tr>
+        <tr id="edit-<%= game.id %>" hidden>
+          <td colspan="6">
+            <form method="POST" action="/admin/teams/<%= team.slug %>/games/<%= game.id %>/edit" class="form-row" style="align-items:flex-end;padding:0.5rem 0">
+              <div class="form-group">
+                <label>Date</label>
+                <input type="date" name="game_date" value="<%= game.game_date %>" required>
+              </div>
+              <div class="form-group">
+                <label>Time</label>
+                <input type="time" name="game_time" value="<%= game.game_time %>" required>
+              </div>
+              <div class="form-group">
+                <label>Home/Away</label>
+                <select name="home_away" required>
+                  <option value="home" <%= game.home_away === 'home' ? 'selected' : '' %>>Home</option>
+                  <option value="away" <%= game.home_away === 'away' ? 'selected' : '' %>>Away</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Field #</label>
+                <input type="text" name="field_number" value="<%= game.field_number || '' %>">
+              </div>
+              <div class="form-group">
+                <button type="submit" class="btn btn-small btn-primary">Save</button>
+              </div>
+            </form>
+          </td>
+        </tr>
+      <% } %>
+    </tbody>
+  </table>
+<% } %>
+
+<%- include('footer') %>

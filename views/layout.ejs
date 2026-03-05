@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title + ' | ' : '' %>Snack Signup</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/" class="nav-brand">Snack Signup</a>
+    <% if (admin) { %>
+      <div class="nav-links">
+        <a href="/admin">Dashboard</a>
+        <a href="/admin/logout">Log out</a>
+      </div>
+    <% } %>
+  </nav>
+  <main class="container">
