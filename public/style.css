@@ -292,6 +292,10 @@ input:focus, select:focus {
   margin: 0 auto;
 }
 
+.public-team h1 {
+  margin: 1rem 0;
+}
+
 .team-meta {
   display: flex;
   justify-content: center;
