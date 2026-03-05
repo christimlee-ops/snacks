@@ -8,8 +8,14 @@
     </div>
   <% } %>
   <h1 class="text-center"><%= team.name %></h1>
+  <% if (team.grade || team.season) { %>
+    <div class="team-meta">
+      <% if (team.grade) { %><span class="badge badge-field"><%= team.grade %></span><% } %>
+      <% if (team.season) { %><span class="badge badge-home"><%= team.season %></span><% } %>
+    </div>
+  <% } %>
   <% if (team.description) { %>
-    <p class="text-center muted"><%= team.description %></p>
+    <p class="team-description"><%= team.description %></p>
   <% } %>
 
   <% if (success) { %>

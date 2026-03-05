@@ -291,6 +291,25 @@ input:focus, select:focus {
   margin: 0 auto;
 }
 
+.team-meta {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.team-description {
+  text-align: center;
+  color: #495057;
+  font-size: 1.05rem;
+  max-width: 500px;
+  margin: -0.25rem auto 1.25rem;
+  padding: 0.5rem 1rem;
+  background: #e9f5ee;
+  border-radius: 8px;
+  line-height: 1.5;
+}
+
 .game-card.game-filled {
   border-left: 4px solid #2d6a4f;
 }

@@ -9,6 +9,8 @@ CREATE TABLE IF NOT EXISTS teams (
   name TEXT NOT NULL,
   slug TEXT UNIQUE NOT NULL,
   description TEXT,
+  grade TEXT,
+  season TEXT,
   logo_path TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );

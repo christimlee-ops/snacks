@@ -19,6 +19,9 @@ db.exec(schema);
 
 // Migrate: add description column if missing
 try { db.exec('ALTER TABLE teams ADD COLUMN description TEXT'); } catch (e) { /* already exists */ }
+// Migrate: add grade and season columns if missing
+try { db.exec('ALTER TABLE teams ADD COLUMN grade TEXT'); } catch (e) { /* already exists */ }
+try { db.exec('ALTER TABLE teams ADD COLUMN season TEXT'); } catch (e) { /* already exists */ }
 
 // Seed default admin if none exists
 const adminExists = db.prepare('SELECT id FROM admin LIMIT 1').get();
@@ -127,13 +130,13 @@ app.post('/admin/teams', requireAdmin, (req, res) => {
 app.post('/admin/teams/:slug/edit', requireAdmin, (req, res) => {
   const team = db.prepare('SELECT * FROM teams WHERE slug = ?').get(req.params.slug);
   if (!team) return res.status(404).send('Team not found');
-  const { name, description } = req.body;
+  const { name, description, grade, season } = req.body;
   if (!name || !name.trim()) return res.redirect('/admin/teams/' + req.params.slug);
   const newSlug = slugify(name.trim());
   const conflict = db.prepare('SELECT id FROM teams WHERE slug = ? AND id != ?').get(newSlug, team.id);
   if (conflict) return res.redirect('/admin/teams/' + req.params.slug);
-  db.prepare('UPDATE teams SET name = ?, slug = ?, description = ? WHERE id = ?')
-    .run(name.trim(), newSlug, (description || '').trim() || null, team.id);
+  db.prepare('UPDATE teams SET name = ?, slug = ?, description = ?, grade = ?, season = ? WHERE id = ?')
+    .run(name.trim(), newSlug, (description || '').trim() || null, (grade || '').trim() || null, (season || '').trim() || null, team.id);
   res.redirect('/admin/teams/' + newSlug);
 });
 
