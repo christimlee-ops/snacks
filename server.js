@@ -125,11 +125,10 @@ app.get('/admin/teams/:slug', requireAdmin, (req, res) => {
   const team = db.prepare('SELECT * FROM teams WHERE slug = ?').get(req.params.slug);
   if (!team) return res.status(404).send('Team not found');
   const games = db.prepare(`
-    SELECT g.*, COUNT(s.id) AS signup_count
+    SELECT g.*, s.id AS signup_id, s.parent_name
     FROM games g
     LEFT JOIN signups s ON s.game_id = g.id
     WHERE g.team_id = ?
-    GROUP BY g.id
     ORDER BY g.game_date, g.game_time
   `).all(team.id);
   res.render('admin-team', { team, games });
@@ -170,6 +169,21 @@ app.post('/admin/teams/:slug/logo', requireAdmin, upload.single('logo'), (req, r
   if (!req.file) return res.redirect('/admin/teams/' + req.params.slug);
   const logoPath = '/uploads/' + req.file.filename;
   db.prepare('UPDATE teams SET logo_path = ? WHERE slug = ?').run(logoPath, req.params.slug);
+  res.redirect('/admin/teams/' + req.params.slug);
+});
+
+// Edit signup name
+app.post('/admin/teams/:slug/signups/:id/edit', requireAdmin, (req, res) => {
+  const { parent_name } = req.body;
+  if (parent_name && parent_name.trim()) {
+    db.prepare('UPDATE signups SET parent_name = ? WHERE id = ?').run(parent_name.trim(), req.params.id);
+  }
+  res.redirect('/admin/teams/' + req.params.slug);
+});
+
+// Delete signup
+app.post('/admin/teams/:slug/signups/:id/delete', requireAdmin, (req, res) => {
+  db.prepare('DELETE FROM signups WHERE id = ?').run(req.params.id);
   res.redirect('/admin/teams/' + req.params.slug);
 });
 

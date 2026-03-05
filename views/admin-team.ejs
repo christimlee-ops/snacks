@@ -63,7 +63,7 @@
         <th>Time</th>
         <th>Home/Away</th>
         <th>Field</th>
-        <th>Signups</th>
+        <th>Signed Up</th>
         <th></th>
       </tr>
     </thead>
@@ -74,7 +74,23 @@
           <td><%= game.game_time %></td>
           <td><%= game.home_away === 'home' ? 'Home' : 'Away' %></td>
           <td><%= game.field_number || '—' %></td>
-          <td><%= game.signup_count %></td>
+          <td>
+            <% if (game.parent_name) { %>
+              <span id="name-display-<%= game.signup_id %>">
+                <%= game.parent_name %>
+                <button type="button" class="btn btn-small btn-outline" onclick="document.getElementById('name-edit-<%= game.signup_id %>').hidden=false; document.getElementById('name-display-<%= game.signup_id %>').hidden=true" style="padding:0.15rem 0.4rem;font-size:0.75rem;margin-left:0.25rem">Edit</button>
+                <form method="POST" action="/admin/teams/<%= team.slug %>/signups/<%= game.signup_id %>/delete" style="display:inline">
+                  <button type="submit" class="btn btn-small btn-danger" onclick="return confirm('Remove signup?')" style="padding:0.15rem 0.4rem;font-size:0.75rem">X</button>
+                </form>
+              </span>
+              <form method="POST" action="/admin/teams/<%= team.slug %>/signups/<%= game.signup_id %>/edit" id="name-edit-<%= game.signup_id %>" hidden style="display:inline-flex;gap:0.25rem;align-items:center">
+                <input type="text" name="parent_name" value="<%= game.parent_name %>" style="width:120px;padding:0.2rem 0.4rem;margin:0">
+                <button type="submit" class="btn btn-small btn-primary" style="padding:0.15rem 0.4rem;font-size:0.75rem">Save</button>
+              </form>
+            <% } else { %>
+              <span class="muted">—</span>
+            <% } %>
+          </td>
           <td style="white-space:nowrap">
             <button type="button" class="btn btn-small btn-outline" onclick="document.getElementById('edit-<%= game.id %>').toggleAttribute('hidden')">Edit</button>
             <form method="POST" action="/admin/teams/<%= team.slug %>/games/<%= game.id %>/delete" style="display:inline">
