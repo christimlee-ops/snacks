@@ -289,7 +289,7 @@ input:focus, select:focus {
 /* Public page */
 .public-team {
   max-width: 700px;
-  margin: 0 auto;
+  margin: -0.75rem auto 0;
 }
 
 .public-team h1 {
