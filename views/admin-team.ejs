@@ -74,23 +74,7 @@
           <td><%= game.game_time %></td>
           <td><%= game.home_away === 'home' ? 'Home' : 'Away' %></td>
           <td><%= game.field_number || '—' %></td>
-          <td>
-            <% if (game.parent_name) { %>
-              <span id="name-display-<%= game.signup_id %>" style="display:inline-flex;align-items:center;gap:0.5rem">
-                <%= game.parent_name %>
-                <button type="button" class="btn btn-small btn-outline" onclick="document.getElementById('name-edit-<%= game.signup_id %>').hidden=false; document.getElementById('name-display-<%= game.signup_id %>').style.display='none'">Edit</button>
-                <form method="POST" action="/admin/teams/<%= team.slug %>/signups/<%= game.signup_id %>/delete" style="display:inline">
-                  <button type="submit" class="btn btn-small btn-danger" onclick="return confirm('Remove signup?')">X</button>
-                </form>
-              </span>
-              <form method="POST" action="/admin/teams/<%= team.slug %>/signups/<%= game.signup_id %>/edit" id="name-edit-<%= game.signup_id %>" hidden style="display:inline-flex;align-items:center;gap:0.5rem">
-                <input type="text" name="parent_name" value="<%= game.parent_name %>" style="width:130px;padding:0.3rem 0.5rem;margin:0">
-                <button type="submit" class="btn btn-small btn-primary">Save</button>
-              </form>
-            <% } else { %>
-              <span class="muted">—</span>
-            <% } %>
-          </td>
+          <td><%= game.parent_name || '—' %></td>
           <td style="white-space:nowrap">
             <button type="button" class="btn btn-small btn-outline" onclick="document.getElementById('edit-<%= game.id %>').toggleAttribute('hidden')">Edit</button>
             <form method="POST" action="/admin/teams/<%= team.slug %>/games/<%= game.id %>/delete" style="display:inline">
@@ -128,6 +112,42 @@
               </div>
               <button type="submit" class="btn btn-primary">Save</button>
             </form>
+            <div style="border-top:1px solid #eee;margin-top:0.75rem;padding-top:0.75rem">
+              <% if (game.parent_name) { %>
+                <div id="signup-display-<%= game.signup_id %>">
+                  <div class="form-row" style="align-items:flex-end">
+                    <div class="form-group">
+                      <label>Signed Up</label>
+                      <input type="text" value="<%= game.parent_name %>" disabled>
+                    </div>
+                    <div class="form-group" style="display:flex;gap:0.5rem;padding-bottom:0.75rem">
+                      <button type="button" class="btn btn-outline" onclick="document.getElementById('signup-display-<%= game.signup_id %>').hidden=true; document.getElementById('signup-edit-<%= game.signup_id %>').hidden=false">Edit</button>
+                      <form method="POST" action="/admin/teams/<%= team.slug %>/signups/<%= game.signup_id %>/delete">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Remove signup?')">Remove</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <form method="POST" action="/admin/teams/<%= team.slug %>/signups/<%= game.signup_id %>/edit" id="signup-edit-<%= game.signup_id %>" hidden>
+                  <div class="form-row" style="align-items:flex-end">
+                    <div class="form-group">
+                      <label>Signed Up</label>
+                      <input type="text" name="parent_name" value="<%= game.parent_name %>">
+                    </div>
+                    <div class="form-group" style="padding-bottom:0.75rem">
+                      <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                  </div>
+                </form>
+              <% } else { %>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Signed Up</label>
+                    <input type="text" value="—" disabled>
+                  </div>
+                </div>
+              <% } %>
+            </div>
           </td>
         </tr>
       <% } %>
