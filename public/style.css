@@ -345,15 +345,15 @@ input:focus, select:focus {
 
 
 .signups-list {
-  margin: 0.75rem 0;
-  padding: 0.75rem;
-  background: #f8f9fa;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  background: none;
   border-radius: 6px;
 }
 
 .signups-list h4 {
   font-size: 1.17em;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0;
   color: #495057;
 }
 
