@@ -248,7 +248,7 @@ input:focus, select:focus {
 
 .logo-center {
   text-align: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .team-header {
@@ -289,11 +289,11 @@ input:focus, select:focus {
 /* Public page */
 .public-team {
   max-width: 700px;
-  margin: -0.75rem auto 0;
+  margin: 0 auto;
 }
 
 .public-team h1 {
-  margin: 1rem 0;
+  margin: 0.75rem 0;
 }
 
 .team-meta {
@@ -308,7 +308,7 @@ input:focus, select:focus {
   color: #495057;
   font-size: 0.75rem;
   font-weight: 700;
-  margin: 0.5rem auto 1.25rem;
+  margin: 0.75rem auto;
   padding: 0.45rem 1rem;
   background: #f0f4f8;
   border: 1px solid #dee2e6;
