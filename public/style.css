@@ -335,6 +335,13 @@ input:focus, select:focus {
   border: 1px solid #a3d9b1;
 }
 
+.game-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
 
 
 .signups-list {
