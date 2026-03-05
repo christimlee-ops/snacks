@@ -17,6 +17,9 @@ db.pragma('foreign_keys = ON');
 const schema = fs.readFileSync(path.join(__dirname, 'db', 'schema.sql'), 'utf8');
 db.exec(schema);
 
+// Migrate: add description column if missing
+try { db.exec('ALTER TABLE teams ADD COLUMN description TEXT'); } catch (e) { /* already exists */ }
+
 // Seed default admin if none exists
 const adminExists = db.prepare('SELECT id FROM admin LIMIT 1').get();
 if (!adminExists) {
@@ -118,6 +121,20 @@ app.post('/admin/teams', requireAdmin, (req, res) => {
   if (existing) return res.redirect('/admin');
   db.prepare('INSERT INTO teams (name, slug) VALUES (?, ?)').run(name.trim(), slug);
   res.redirect('/admin/teams/' + slug);
+});
+
+// Edit team name & description
+app.post('/admin/teams/:slug/edit', requireAdmin, (req, res) => {
+  const team = db.prepare('SELECT * FROM teams WHERE slug = ?').get(req.params.slug);
+  if (!team) return res.status(404).send('Team not found');
+  const { name, description } = req.body;
+  if (!name || !name.trim()) return res.redirect('/admin/teams/' + req.params.slug);
+  const newSlug = slugify(name.trim());
+  const conflict = db.prepare('SELECT id FROM teams WHERE slug = ? AND id != ?').get(newSlug, team.id);
+  if (conflict) return res.redirect('/admin/teams/' + req.params.slug);
+  db.prepare('UPDATE teams SET name = ?, slug = ?, description = ? WHERE id = ?')
+    .run(name.trim(), newSlug, (description || '').trim() || null, team.id);
+  res.redirect('/admin/teams/' + newSlug);
 });
 
 // Admin team page

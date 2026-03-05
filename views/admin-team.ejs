@@ -12,6 +12,21 @@
 </div>
 
 <div class="card">
+  <h2>Team Details</h2>
+  <form method="POST" action="/admin/teams/<%= team.slug %>/edit">
+    <div class="form-group">
+      <label for="team_name">Team Name</label>
+      <input type="text" id="team_name" name="name" value="<%= team.name %>" required>
+    </div>
+    <div class="form-group">
+      <label for="team_description">Description</label>
+      <textarea id="team_description" name="description" rows="3" placeholder="e.g. U10 boys soccer, Fall 2026"><%= team.description || '' %></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+  </form>
+</div>
+
+<div class="card">
   <h2>Upload Logo</h2>
   <form method="POST" action="/admin/teams/<%= team.slug %>/logo" enctype="multipart/form-data" class="inline-form">
     <input type="file" name="logo" accept="image/*" required>

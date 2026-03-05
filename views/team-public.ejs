@@ -8,6 +8,9 @@
     </div>
   <% } %>
   <h1 class="text-center"><%= team.name %></h1>
+  <% if (team.description) { %>
+    <p class="text-center muted"><%= team.description %></p>
+  <% } %>
 
   <% if (success) { %>
     <div class="success-msg">Thanks for signing up to bring snacks!</div>
