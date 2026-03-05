@@ -29,7 +29,12 @@
       </div>
       <div class="form-group">
         <label for="game_time">Time</label>
-        <input type="time" id="game_time" name="game_time" step="900" required>
+        <select id="game_time" name="game_time" required>
+          <option value="">Select time</option>
+          <% for (let h = 6; h <= 21; h++) { for (const m of ['00','15','30','45']) { const val = String(h).padStart(2,'0') + ':' + m; const hour = h > 12 ? h - 12 : (h === 0 ? 12 : h); const ampm = h >= 12 ? 'PM' : 'AM'; %>
+            <option value="<%= val %>"><%= hour %>:<%= m %> <%= ampm %></option>
+          <% } } %>
+        </select>
       </div>
       <div class="form-group">
         <label for="home_away">Home/Away</label>
@@ -87,7 +92,11 @@
                 </div>
                 <div class="form-group">
                   <label>Time</label>
-                  <input type="time" name="game_time" value="<%= game.game_time %>" step="900" required>
+                  <select name="game_time" required>
+                    <% for (let h = 6; h <= 21; h++) { for (const m of ['00','15','30','45']) { const val = String(h).padStart(2,'0') + ':' + m; const hour = h > 12 ? h - 12 : (h === 0 ? 12 : h); const ampm = h >= 12 ? 'PM' : 'AM'; %>
+                      <option value="<%= val %>" <%= game.game_time === val ? 'selected' : '' %>><%= hour %>:<%= m %> <%= ampm %></option>
+                    <% } } %>
+                  </select>
                 </div>
                 <div class="form-group">
                   <label>Home/Away</label>
