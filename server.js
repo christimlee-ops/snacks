@@ -211,7 +211,10 @@ app.get('/team/:slug', (req, res) => {
     delete game.signups_json;
   }
 
-  res.render('team-public', { team, games, success: req.query.success });
+  const ogImage = team.logo_path
+    ? req.protocol + '://' + req.get('host') + team.logo_path
+    : null;
+  res.render('team-public', { team, games, success: req.query.success, ogImage });
 });
 
 // Snack signup

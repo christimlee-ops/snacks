@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= typeof title !== 'undefined' ? title + ' | ' : '' %>Snack Signup</title>
+  <% if (typeof ogImage !== 'undefined' && ogImage) { %>
+    <meta property="og:image" content="<%= ogImage %>">
+    <meta property="og:title" content="<%= typeof title !== 'undefined' ? title : 'Snack Signup' %>">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content="<%= ogImage %>">
+  <% } %>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="stylesheet" href="/style.css">
 </head>
