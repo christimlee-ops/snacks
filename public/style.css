@@ -269,6 +269,7 @@ input:focus, select:focus {
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.25rem;
 }
 
 .games-table th,
@@ -300,13 +301,11 @@ input:focus, select:focus {
 
 .team-description {
   text-align: center;
-  color: #495057;
-  font-size: 1.05rem;
-  max-width: 500px;
+  color: #155724;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
   margin: -0.25rem auto 1.25rem;
-  padding: 0.5rem 1rem;
-  background: #e9f5ee;
-  border-radius: 8px;
   line-height: 1.5;
 }
 
