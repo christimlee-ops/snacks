@@ -309,11 +309,11 @@ input:focus, select:focus {
   font-size: 0.75rem;
   font-weight: 700;
   margin: 0.5rem auto 1.25rem;
-  padding: 0.5rem 1rem;
+  padding: 0.45rem 1rem;
   background: #f0f4f8;
   border: 1px solid #dee2e6;
   border-radius: 12px;
-  line-height: 1;
+  line-height: 1.2;
 }
 
 .game-card.game-filled {
