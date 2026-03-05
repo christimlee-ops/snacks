@@ -306,14 +306,14 @@ input:focus, select:focus {
 .team-description {
   text-align: center;
   color: #1b4332;
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 0.9rem;
+  font-weight: 500;
   margin: 0.75rem auto;
-  padding: 0.45rem 1rem;
+  padding: 0.5rem 1.25rem;
   background: #d8f3dc;
   border: 1px solid #b7e4c7;
   border-radius: 12px;
-  line-height: 1.2;
+  line-height: 1.4;
 }
 
 .game-card.game-filled {
