@@ -29,7 +29,7 @@
       </div>
       <div class="form-group">
         <label for="game_time">Time</label>
-        <input type="time" id="game_time" name="game_time" required>
+        <input type="time" id="game_time" name="game_time" step="900" required>
       </div>
       <div class="form-group">
         <label for="home_away">Home/Away</label>
@@ -79,29 +79,29 @@
         </tr>
         <tr id="edit-<%= game.id %>" hidden>
           <td colspan="6">
-            <form method="POST" action="/admin/teams/<%= team.slug %>/games/<%= game.id %>/edit" class="form-row" style="align-items:flex-end;padding:0.5rem 0">
-              <div class="form-group">
-                <label>Date</label>
-                <input type="date" name="game_date" value="<%= game.game_date %>" required>
+            <form method="POST" action="/admin/teams/<%= team.slug %>/games/<%= game.id %>/edit" class="game-form" style="padding:0.5rem 0">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Date</label>
+                  <input type="date" name="game_date" value="<%= game.game_date %>" required>
+                </div>
+                <div class="form-group">
+                  <label>Time</label>
+                  <input type="time" name="game_time" value="<%= game.game_time %>" step="900" required>
+                </div>
+                <div class="form-group">
+                  <label>Home/Away</label>
+                  <select name="home_away" required>
+                    <option value="home" <%= game.home_away === 'home' ? 'selected' : '' %>>Home</option>
+                    <option value="away" <%= game.home_away === 'away' ? 'selected' : '' %>>Away</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Field #</label>
+                  <input type="text" name="field_number" value="<%= game.field_number || '' %>">
+                </div>
               </div>
-              <div class="form-group">
-                <label>Time</label>
-                <input type="time" name="game_time" value="<%= game.game_time %>" required>
-              </div>
-              <div class="form-group">
-                <label>Home/Away</label>
-                <select name="home_away" required>
-                  <option value="home" <%= game.home_away === 'home' ? 'selected' : '' %>>Home</option>
-                  <option value="away" <%= game.home_away === 'away' ? 'selected' : '' %>>Away</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Field #</label>
-                <input type="text" name="field_number" value="<%= game.field_number || '' %>">
-              </div>
-              <div class="form-group">
-                <button type="submit" class="btn btn-small btn-primary">Save</button>
-              </div>
+              <button type="submit" class="btn btn-primary">Save</button>
             </form>
           </td>
         </tr>
