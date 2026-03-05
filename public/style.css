@@ -307,7 +307,9 @@ input:focus, select:focus {
 }
 
 .badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   padding: 0.15rem 0.6rem;
   border-radius: 12px;
   font-size: 0.75rem;
@@ -333,18 +335,7 @@ input:focus, select:focus {
   border: 1px solid #a3d9b1;
 }
 
-.game-badges {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.25rem;
-}
 
-.game-badges .badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
 
 .signups-list {
   margin: 0.75rem 0;
