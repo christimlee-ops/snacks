@@ -312,13 +312,13 @@ input:focus, select:focus {
 }
 
 .badge-home {
-  background: #d4edda;
-  color: #155724;
+  background: #e9ecef;
+  color: #495057;
 }
 
 .badge-away {
-  background: #cce5ff;
-  color: #004085;
+  background: #dc3545;
+  color: white;
 }
 
 .badge-field {
