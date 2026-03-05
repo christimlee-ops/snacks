@@ -309,7 +309,7 @@ input:focus, select:focus {
   background: #f0f4f8;
   border: 1px solid #dee2e6;
   border-radius: 12px;
-  line-height: 1.5;
+  line-height: 1;
 }
 
 .game-card.game-filled {
