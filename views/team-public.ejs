@@ -24,7 +24,7 @@
             <span class="badge badge-<%= game.home_away %>" style="display:inline-flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 24 24" fill="<%= game.home_away === 'home' ? 'white' : '#dc3545' %>" stroke="<%= game.home_away === 'home' ? '#333' : '#a71d2a' %>" stroke-width="1.5"><path d="M6 2L1 7v3h4v12h14V10h4V7l-5-5-4 3h-4L6 2z"/></svg><%= game.home_away === 'home' ? 'Home' : 'Away' %></span>
           </h3>
           <% if (game.field_number) { %>
-            <p class="muted">Field <%= game.field_number %></p>
+            <p class="muted" style="display:flex;align-items:center;gap:4px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="12" y1="4" x2="12" y2="20"/><circle cx="12" cy="12" r="3"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg> Field <%= game.field_number %></p>
           <% } %>
         </div>
 
