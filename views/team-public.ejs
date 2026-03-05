@@ -30,8 +30,7 @@
 
         <% if (game.signups.length > 0) { %>
           <div class="signups-list">
-            <h4>Signed up:</h4>
-            <p><strong><%= game.signups[0].parent_name %></strong></p>
+            <h4>Signed up: <%= game.signups[0].parent_name %></h4>
           </div>
         <% } else { %>
           <form method="POST" action="/team/<%= team.slug %>/signup" class="signup-form">
