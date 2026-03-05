@@ -306,6 +306,10 @@ input:focus, select:focus {
   font-weight: 700;
   text-transform: uppercase;
   margin: -0.25rem auto 1.25rem;
+  padding: 0.5rem 1rem;
+  background: #d4edda;
+  border: 1px solid #a3d9b1;
+  border-radius: 12px;
   line-height: 1.5;
 }
 
