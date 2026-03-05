@@ -218,6 +218,10 @@ app.post('/team/:slug/signup', (req, res) => {
 });
 
 // --- Start server ---
-app.listen(PORT, () => {
-  console.log(`Snack signup app running at http://localhost:${PORT}`);
-});
+if (typeof PhusionPassenger !== 'undefined') {
+  app.listen('passenger');
+} else {
+  app.listen(PORT, () => {
+    console.log(`Snack signup app running at http://localhost:${PORT}`);
+  });
+}
