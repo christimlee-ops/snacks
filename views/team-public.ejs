@@ -20,7 +20,7 @@
       <div class="card game-card <%= game.signups.length > 0 ? 'game-filled' : 'game-open' %>">
         <div class="game-info">
           <h3>
-            <%= game.game_date.split('-').slice(1).join('/') %> at <%= (() => { const [h,m] = game.game_time.split(':'); const hr = parseInt(h); return (hr > 12 ? hr - 12 : (hr === 0 ? 12 : hr)) + (m !== '00' ? ':' + m : '') + ' ' + (hr >= 12 ? 'PM' : 'AM'); })() %>
+            <%= (() => { const [y,m,d] = game.game_date.split('-'); const months = ['January','February','March','April','May','June','July','August','September','October','November','December']; return months[parseInt(m)-1] + ' ' + parseInt(d); })() %> at <%= (() => { const [h,m] = game.game_time.split(':'); const hr = parseInt(h); return (hr > 12 ? hr - 12 : (hr === 0 ? 12 : hr)) + (m !== '00' ? ':' + m : '') + ' ' + (hr >= 12 ? 'PM' : 'AM'); })() %>
             <% if (game.field_number) { %>
               <span class="badge badge-field"><svg width="14" height="14" viewBox="0 0 24 24" fill="white" stroke="#155724" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="12" y1="4" x2="12" y2="20"/><circle cx="12" cy="12" r="3"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>Field <%= game.field_number %></span>
             <% } %>
