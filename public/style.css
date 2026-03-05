@@ -291,8 +291,12 @@ input:focus, select:focus {
   margin: 0 auto;
 }
 
-.game-card {
+.game-card.game-filled {
   border-left: 4px solid #2d6a4f;
+}
+
+.game-card.game-open {
+  border-left: 4px solid #e8a838;
 }
 
 .game-info h3 {
