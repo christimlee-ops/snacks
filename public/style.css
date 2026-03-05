@@ -158,7 +158,7 @@ input:focus, select:focus {
 .btn {
   display: inline-block;
   padding: 0.5rem 1.25rem;
-  border: none;
+  border: 2px solid transparent;
   border-radius: 6px;
   font-size: 0.95rem;
   font-weight: 600;
@@ -166,6 +166,7 @@ input:focus, select:focus {
   text-decoration: none;
   text-align: center;
   transition: opacity 0.2s;
+  box-sizing: border-box;
 }
 
 .btn:hover {
@@ -175,6 +176,7 @@ input:focus, select:focus {
 .btn-primary {
   background: #2d6a4f;
   color: white;
+  border-color: #2d6a4f;
 }
 
 .btn-outline {
@@ -186,6 +188,7 @@ input:focus, select:focus {
 .btn-danger {
   background: #dc3545;
   color: white;
+  border-color: #dc3545;
 }
 
 .btn-small {
