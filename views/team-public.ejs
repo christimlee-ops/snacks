@@ -55,13 +55,13 @@
         <% } %>
 
         <% if (players.length > 0) { %>
+          <% let attending = 0; %>
+          <% for (const p of players) { if (rsvpSet.has(game.id + '-' + p.id)) attending++; } %>
           <div class="rsvp-section">
-            <h4>Who's Coming?</h4>
+            <h4>Who's Coming? <span class="rsvp-count"><%= attending %> / <%= players.length %></span></h4>
             <div class="rsvp-list">
-              <% let attending = 0; %>
               <% for (const player of players) { %>
                 <% const isRsvped = rsvpSet.has(game.id + '-' + player.id); %>
-                <% if (isRsvped) attending++; %>
                 <form method="POST" action="/team/<%= team.slug %>/rsvp" style="display:inline">
                   <input type="hidden" name="game_id" value="<%= game.id %>">
                   <input type="hidden" name="player_id" value="<%= player.id %>">
@@ -69,7 +69,6 @@
                 </form>
               <% } %>
             </div>
-            <p class="rsvp-count"><%= attending %> / <%= players.length %> attending</p>
           </div>
         <% } %>
       </div>
