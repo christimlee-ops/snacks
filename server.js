@@ -77,8 +77,8 @@ function requireAdmin(req, res, next) {
 const storage = multer.diskStorage({
   destination: path.join(__dirname, 'uploads'),
   filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, req.params.slug + '-logo' + ext);
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, req.params.slug + '-logo-' + Date.now() + ext);
   },
 });
 const upload = multer({
@@ -208,23 +208,24 @@ app.post('/admin/teams/:slug/games/:id/delete', requireAdmin, (req, res) => {
 });
 
 // Upload logo
-app.post('/admin/teams/:slug/logo', requireAdmin, (req, res, next) => {
-  // Delete old logo files for this team before multer saves the new one
-  const uploadsDir = path.join(__dirname, 'uploads');
-  try {
-    const files = fs.readdirSync(uploadsDir);
-    for (const f of files) {
-      if (f.startsWith(req.params.slug + '-logo')) {
-        fs.unlinkSync(path.join(uploadsDir, f));
+app.post('/admin/teams/:slug/logo', requireAdmin, (req, res) => {
+  upload.single('logo')(req, res, (err) => {
+    if (err) return res.redirect('/admin/teams/' + req.params.slug);
+    if (!req.file) return res.redirect('/admin/teams/' + req.params.slug);
+    const newFilename = req.file.filename;
+    const logoPath = '/uploads/' + newFilename;
+    // Clean up old logo files (best-effort)
+    const uploadsDir = path.join(__dirname, 'uploads');
+    try {
+      for (const f of fs.readdirSync(uploadsDir)) {
+        if (f.startsWith(req.params.slug + '-logo') && f !== newFilename) {
+          try { fs.unlinkSync(path.join(uploadsDir, f)); } catch (e) { /* in use */ }
+        }
       }
-    }
-  } catch (e) { /* ignore */ }
-  next();
-}, upload.single('logo'), (req, res) => {
-  if (!req.file) return res.redirect('/admin/teams/' + req.params.slug);
-  const logoPath = '/uploads/' + req.file.filename;
-  db.prepare('UPDATE teams SET logo_path = ? WHERE slug = ?').run(logoPath, req.params.slug);
-  res.redirect('/admin/teams/' + req.params.slug);
+    } catch (e) { /* ignore */ }
+    db.prepare('UPDATE teams SET logo_path = ? WHERE slug = ?').run(logoPath, req.params.slug);
+    res.redirect('/admin/teams/' + req.params.slug);
+  });
 });
 
 // Edit signup name
