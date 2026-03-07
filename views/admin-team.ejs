@@ -132,20 +132,6 @@
                       <label>Phone</label>
                       <input type="tel" name="phone_number" value="<%= game.phone_number || '' %>" placeholder="(555) 123-4567">
                     </div>
-                    <div class="form-group">
-                      <label>Carrier</label>
-                      <select name="carrier">
-                        <option value="">None</option>
-                        <option value="att" <%= game.carrier === 'att' ? 'selected' : '' %>>AT&T</option>
-                        <option value="tmobile" <%= game.carrier === 'tmobile' ? 'selected' : '' %>>T-Mobile</option>
-                        <option value="verizon" <%= game.carrier === 'verizon' ? 'selected' : '' %>>Verizon</option>
-                        <option value="cricket" <%= game.carrier === 'cricket' ? 'selected' : '' %>>Cricket</option>
-                        <option value="metro" <%= game.carrier === 'metro' ? 'selected' : '' %>>Metro</option>
-                        <option value="uscellular" <%= game.carrier === 'uscellular' ? 'selected' : '' %>>US Cellular</option>
-                        <option value="boost" <%= game.carrier === 'boost' ? 'selected' : '' %>>Boost</option>
-                        <option value="mint" <%= game.carrier === 'mint' ? 'selected' : '' %>>Mint</option>
-                      </select>
-                    </div>
                     <div class="form-group" style="padding-bottom:0.75rem">
                       <button type="submit" class="btn btn-primary">Save</button>
                     </div>
