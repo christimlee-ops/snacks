@@ -452,6 +452,49 @@ input:focus, select:focus {
   margin-bottom: 0.75rem;
 }
 
+/* Landing page */
+.landing {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.landing h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.landing-subtitle {
+  color: #6c757d;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.landing-card h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.landing-steps {
+  padding-left: 1.25rem;
+  margin: 0;
+}
+
+.landing-steps li {
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.landing-steps li:last-child {
+  margin-bottom: 0;
+}
+
+.btn-large {
+  padding: 0.75rem 2rem;
+  font-size: 1.1rem;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .form-row {

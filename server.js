@@ -81,11 +81,16 @@ function slugify(name) {
 
 // --- Routes ---
 
-// Home — public team list (or redirect to single team)
+// Landing page
 app.get('/', (req, res) => {
+  res.render('landing');
+});
+
+// Browse teams
+app.get('/teams', (req, res) => {
   const teams = db.prepare('SELECT * FROM teams ORDER BY name').all();
   if (teams.length === 1) return res.redirect('/team/' + teams[0].slug);
-  res.render('home', { teams });
+  res.render('teams', { teams });
 });
 
 // Login

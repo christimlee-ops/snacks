@@ -1,8 +1,10 @@
-<% const title = 'Home'; %>
+<% const title = 'Teams'; %>
 <%- include('layout') %>
 
-<h1 class="text-center">Snack Signup</h1>
-<p class="text-center muted" style="margin-bottom:1.5rem;">Pick your team to view the schedule and sign up to bring snacks!</p>
+<a href="/" class="back-link">&larr; Home</a>
+
+<h1 class="text-center">Teams</h1>
+<p class="text-center muted" style="margin-bottom:1.5rem;">Pick your team to view the schedule and sign up to bring snacks.</p>
 
 <% if (teams.length === 0) { %>
   <p class="text-center muted">No teams yet. Check back soon!</p>
