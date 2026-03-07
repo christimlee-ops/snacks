@@ -5,8 +5,6 @@ const multer = require('multer');
 const bcrypt = require('bcrypt');
 const path = require('path');
 const fs = require('fs');
-const twilio = require('twilio');
-const cron = require('node-cron');
 
 const app = express();
 const PORT = 3000;
@@ -24,9 +22,6 @@ try { db.exec('ALTER TABLE teams ADD COLUMN description TEXT'); } catch (e) { /*
 // Migrate: add grade and season columns if missing
 try { db.exec('ALTER TABLE teams ADD COLUMN grade TEXT'); } catch (e) { /* already exists */ }
 try { db.exec('ALTER TABLE teams ADD COLUMN season TEXT'); } catch (e) { /* already exists */ }
-// Migrate: add phone_number and carrier columns to signups
-try { db.exec('ALTER TABLE signups ADD COLUMN phone_number TEXT'); } catch (e) { /* already exists */ }
-try { db.exec('ALTER TABLE signups ADD COLUMN carrier TEXT'); } catch (e) { /* already exists */ }
 
 // Seed default admin if none exists
 const adminExists = db.prepare('SELECT id FROM admin LIMIT 1').get();
@@ -82,19 +77,6 @@ const upload = multer({
 // --- Helpers ---
 function slugify(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-}
-
-function sanitizePhone(raw) {
-  if (!raw) return null;
-  const digits = raw.replace(/\D/g, '');
-  if (digits.length === 10) return digits;
-  if (digits.length === 11 && digits.startsWith('1')) return digits.slice(1);
-  return null;
-}
-
-function formatPhoneDisplay(digits) {
-  if (!digits || digits.length !== 10) return digits || '';
-  return '(' + digits.slice(0,3) + ') ' + digits.slice(3,6) + '-' + digits.slice(6);
 }
 
 // --- Routes ---
@@ -163,13 +145,13 @@ app.get('/admin/teams/:slug', requireAdmin, (req, res) => {
   const team = db.prepare('SELECT * FROM teams WHERE slug = ?').get(req.params.slug);
   if (!team) return res.status(404).send('Team not found');
   const games = db.prepare(`
-    SELECT g.*, s.id AS signup_id, s.parent_name, s.phone_number
+    SELECT g.*, s.id AS signup_id, s.parent_name
     FROM games g
     LEFT JOIN signups s ON s.game_id = g.id
     WHERE g.team_id = ?
     ORDER BY g.game_date, g.game_time
   `).all(team.id);
-  res.render('admin-team', { team, games, formatPhoneDisplay });
+  res.render('admin-team', { team, games });
 });
 
 // Add game
@@ -210,13 +192,12 @@ app.post('/admin/teams/:slug/logo', requireAdmin, upload.single('logo'), (req, r
   res.redirect('/admin/teams/' + req.params.slug);
 });
 
-// Edit signup name + phone
+// Edit signup name
 app.post('/admin/teams/:slug/signups/:id/edit', requireAdmin, (req, res) => {
-  const { parent_name, phone_number } = req.body;
+  const { parent_name } = req.body;
   if (parent_name && parent_name.trim()) {
-    const phone = sanitizePhone(phone_number);
-    db.prepare('UPDATE signups SET parent_name = ?, phone_number = ? WHERE id = ?')
-      .run(parent_name.trim(), phone, req.params.id);
+    db.prepare('UPDATE signups SET parent_name = ? WHERE id = ?')
+      .run(parent_name.trim(), req.params.id);
   }
   res.redirect('/admin/teams/' + req.params.slug);
 });
@@ -235,7 +216,7 @@ app.get('/team/:slug', (req, res) => {
   if (!team) return res.status(404).send('Team not found');
   const games = db.prepare(`
     SELECT g.*, json_group_array(
-      CASE WHEN s.id IS NOT NULL THEN json_object('id', s.id, 'parent_name', s.parent_name, 'snack_item', s.snack_item, 'phone_number', s.phone_number) ELSE NULL END
+      CASE WHEN s.id IS NOT NULL THEN json_object('id', s.id, 'parent_name', s.parent_name, 'snack_item', s.snack_item) ELSE NULL END
     ) AS signups_json
     FROM games g
     LEFT JOIN signups s ON s.game_id = g.id
@@ -261,7 +242,7 @@ app.get('/team/:slug', (req, res) => {
 app.post('/team/:slug/signup', (req, res) => {
   const team = db.prepare('SELECT * FROM teams WHERE slug = ?').get(req.params.slug);
   if (!team) return res.status(404).send('Team not found');
-  const { game_id, parent_name, phone_number } = req.body;
+  const { game_id, parent_name } = req.body;
   if (!game_id || !parent_name) return res.redirect('/team/' + req.params.slug);
   // Verify game belongs to team
   const game = db.prepare('SELECT id FROM games WHERE id = ? AND team_id = ?').get(game_id, team.id);
@@ -269,58 +250,9 @@ app.post('/team/:slug/signup', (req, res) => {
   // Only allow one signup per game
   const existing = db.prepare('SELECT id FROM signups WHERE game_id = ?').get(game_id);
   if (existing) return res.redirect('/team/' + req.params.slug);
-  const phone = sanitizePhone(phone_number);
-  db.prepare('INSERT INTO signups (game_id, parent_name, snack_item, phone_number) VALUES (?, ?, ?, ?)')
-    .run(game_id, parent_name.trim(), '', phone);
+  db.prepare('INSERT INTO signups (game_id, parent_name, snack_item) VALUES (?, ?, ?)')
+    .run(game_id, parent_name.trim(), '');
   res.redirect('/team/' + req.params.slug + '?success=1');
-});
-
-// --- SMS Reminder System (Twilio) ---
-const twilioClient = (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN)
-  ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
-  : null;
-
-async function sendSmsReminder(phone, teamName, gameDate, gameTime) {
-  if (!twilioClient || !phone || !process.env.TWILIO_FROM_NUMBER) return;
-  const [h, m] = gameTime.split(':');
-  const hr = parseInt(h);
-  const timeStr = (hr > 12 ? hr - 12 : (hr === 0 ? 12 : hr)) + (m !== '00' ? ':' + m : '') + (hr >= 12 ? 'PM' : 'AM');
-  const [y, mo, d] = gameDate.split('-');
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const dateStr = months[parseInt(mo) - 1] + ' ' + parseInt(d);
-  const body = `Reminder: ${teamName} game tomorrow (${dateStr}) at ${timeStr}. Don't forget snacks!`;
-  try {
-    await twilioClient.messages.create({
-      body,
-      from: process.env.TWILIO_FROM_NUMBER,
-      to: '+1' + phone,
-    });
-  } catch (err) {
-    console.error('SMS send failed for', phone, err.message);
-  }
-}
-
-// Run daily at 00:00 UTC = 5:00 PM MST (Arizona has no DST)
-cron.schedule('0 0 * * *', () => {
-  // "Tomorrow" in MST = UTC minus 7 hours, then add 1 day
-  const now = new Date();
-  const mstNow = new Date(now.getTime() - 7 * 60 * 60 * 1000);
-  const tomorrow = new Date(mstNow);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const tomorrowStr = tomorrow.toISOString().slice(0, 10);
-
-  const rows = db.prepare(`
-    SELECT s.phone_number, t.name AS team_name, g.game_date, g.game_time
-    FROM signups s
-    JOIN games g ON g.id = s.game_id
-    JOIN teams t ON t.id = g.team_id
-    WHERE g.game_date = ? AND s.phone_number IS NOT NULL
-  `).all(tomorrowStr);
-
-  for (const row of rows) {
-    sendSmsReminder(row.phone_number, row.team_name, row.game_date, row.game_time);
-  }
-  if (rows.length > 0) console.log(`Sent ${rows.length} SMS reminder(s) for ${tomorrowStr}`);
 });
 
 // --- Start server ---
