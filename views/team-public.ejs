@@ -41,14 +41,14 @@
 
         <% if (game.signups.length > 0) { %>
           <div class="signups-list">
-            <h4>Signed up: <%= game.signups[0].parent_name %></h4>
+            <h4>Snack Signup: <%= game.signups[0].parent_name %></h4>
           </div>
         <% } else { %>
           <form method="POST" action="/team/<%= team.slug %>/signup" class="signup-form">
             <input type="hidden" name="game_id" value="<%= game.id %>">
             <div class="form-row">
               <input type="text" name="parent_name" placeholder="Your name" required>
-              <button type="submit" class="btn btn-primary">Sign Up</button>
+              <button type="submit" class="btn btn-primary">Snack Sign Up</button>
             </div>
           </form>
         <% } %>

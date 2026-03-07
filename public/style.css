@@ -435,23 +435,6 @@ input:focus, select:focus {
   line-height: 1.4;
 }
 
-.phone-row {
-  display: flex;
-  gap: 0.5rem;
-  align-items: flex-end;
-  margin-top: 0.5rem;
-}
-
-.phone-row .form-group {
-  flex: 1;
-  min-width: 0;
-}
-
-.phone-row .btn {
-  white-space: nowrap;
-  margin-bottom: 0.75rem;
-}
-
 /* Landing page */
 .landing {
   max-width: 600px;
