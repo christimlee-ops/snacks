@@ -5,6 +5,8 @@ const multer = require('multer');
 const bcrypt = require('bcrypt');
 const path = require('path');
 const fs = require('fs');
+const nodemailer = require('nodemailer');
+const cron = require('node-cron');
 
 const app = express();
 const PORT = 3000;
@@ -22,6 +24,9 @@ try { db.exec('ALTER TABLE teams ADD COLUMN description TEXT'); } catch (e) { /*
 // Migrate: add grade and season columns if missing
 try { db.exec('ALTER TABLE teams ADD COLUMN grade TEXT'); } catch (e) { /* already exists */ }
 try { db.exec('ALTER TABLE teams ADD COLUMN season TEXT'); } catch (e) { /* already exists */ }
+// Migrate: add phone_number and carrier columns to signups
+try { db.exec('ALTER TABLE signups ADD COLUMN phone_number TEXT'); } catch (e) { /* already exists */ }
+try { db.exec('ALTER TABLE signups ADD COLUMN carrier TEXT'); } catch (e) { /* already exists */ }
 
 // Seed default admin if none exists
 const adminExists = db.prepare('SELECT id FROM admin LIMIT 1').get();
@@ -74,9 +79,38 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-// --- Helper ---
+// --- Helpers ---
 function slugify(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
+function sanitizePhone(raw) {
+  if (!raw) return null;
+  const digits = raw.replace(/\D/g, '');
+  if (digits.length === 10) return digits;
+  if (digits.length === 11 && digits.startsWith('1')) return digits.slice(1);
+  return null;
+}
+
+const CARRIER_GATEWAYS = {
+  'att':       'txt.att.net',
+  'tmobile':   'tmomail.net',
+  'verizon':   'vtext.com',
+  'cricket':   'sms.cricketwireless.net',
+  'metro':     'mymetropcs.com',
+  'uscellular':'email.uscc.net',
+  'boost':     'sms.myboostmobile.com',
+  'mint':      'tmomail.net',
+};
+
+function sanitizeCarrier(raw) {
+  if (!raw) return null;
+  return CARRIER_GATEWAYS[raw] ? raw : null;
+}
+
+function formatPhoneDisplay(digits) {
+  if (!digits || digits.length !== 10) return digits || '';
+  return '(' + digits.slice(0,3) + ') ' + digits.slice(3,6) + '-' + digits.slice(6);
 }
 
 // --- Routes ---
@@ -145,13 +179,13 @@ app.get('/admin/teams/:slug', requireAdmin, (req, res) => {
   const team = db.prepare('SELECT * FROM teams WHERE slug = ?').get(req.params.slug);
   if (!team) return res.status(404).send('Team not found');
   const games = db.prepare(`
-    SELECT g.*, s.id AS signup_id, s.parent_name
+    SELECT g.*, s.id AS signup_id, s.parent_name, s.phone_number, s.carrier
     FROM games g
     LEFT JOIN signups s ON s.game_id = g.id
     WHERE g.team_id = ?
     ORDER BY g.game_date, g.game_time
   `).all(team.id);
-  res.render('admin-team', { team, games });
+  res.render('admin-team', { team, games, formatPhoneDisplay });
 });
 
 // Add game
@@ -192,11 +226,14 @@ app.post('/admin/teams/:slug/logo', requireAdmin, upload.single('logo'), (req, r
   res.redirect('/admin/teams/' + req.params.slug);
 });
 
-// Edit signup name
+// Edit signup name + phone/carrier
 app.post('/admin/teams/:slug/signups/:id/edit', requireAdmin, (req, res) => {
-  const { parent_name } = req.body;
+  const { parent_name, phone_number, carrier } = req.body;
   if (parent_name && parent_name.trim()) {
-    db.prepare('UPDATE signups SET parent_name = ? WHERE id = ?').run(parent_name.trim(), req.params.id);
+    const phone = sanitizePhone(phone_number);
+    const carr = sanitizeCarrier(carrier);
+    db.prepare('UPDATE signups SET parent_name = ?, phone_number = ?, carrier = ? WHERE id = ?')
+      .run(parent_name.trim(), phone, carr, req.params.id);
   }
   res.redirect('/admin/teams/' + req.params.slug);
 });
@@ -215,7 +252,7 @@ app.get('/team/:slug', (req, res) => {
   if (!team) return res.status(404).send('Team not found');
   const games = db.prepare(`
     SELECT g.*, json_group_array(
-      CASE WHEN s.id IS NOT NULL THEN json_object('parent_name', s.parent_name, 'snack_item', s.snack_item) ELSE NULL END
+      CASE WHEN s.id IS NOT NULL THEN json_object('id', s.id, 'parent_name', s.parent_name, 'snack_item', s.snack_item, 'phone_number', s.phone_number, 'carrier', s.carrier) ELSE NULL END
     ) AS signups_json
     FROM games g
     LEFT JOIN signups s ON s.game_id = g.id
@@ -241,7 +278,7 @@ app.get('/team/:slug', (req, res) => {
 app.post('/team/:slug/signup', (req, res) => {
   const team = db.prepare('SELECT * FROM teams WHERE slug = ?').get(req.params.slug);
   if (!team) return res.status(404).send('Team not found');
-  const { game_id, parent_name } = req.body;
+  const { game_id, parent_name, phone_number, carrier } = req.body;
   if (!game_id || !parent_name) return res.redirect('/team/' + req.params.slug);
   // Verify game belongs to team
   const game = db.prepare('SELECT id FROM games WHERE id = ? AND team_id = ?').get(game_id, team.id);
@@ -249,9 +286,72 @@ app.post('/team/:slug/signup', (req, res) => {
   // Only allow one signup per game
   const existing = db.prepare('SELECT id FROM signups WHERE game_id = ?').get(game_id);
   if (existing) return res.redirect('/team/' + req.params.slug);
-  db.prepare('INSERT INTO signups (game_id, parent_name, snack_item) VALUES (?, ?, ?)')
-    .run(game_id, parent_name.trim(), '');
+  const phone = sanitizePhone(phone_number);
+  const carr = sanitizeCarrier(carrier);
+  db.prepare('INSERT INTO signups (game_id, parent_name, snack_item, phone_number, carrier) VALUES (?, ?, ?, ?, ?)')
+    .run(game_id, parent_name.trim(), '', phone, carr);
   res.redirect('/team/' + req.params.slug + '?success=1');
+});
+
+// Update phone on existing signup (public)
+app.post('/team/:slug/signup/:id/phone', (req, res) => {
+  const team = db.prepare('SELECT * FROM teams WHERE slug = ?').get(req.params.slug);
+  if (!team) return res.status(404).send('Team not found');
+  const signup = db.prepare(`
+    SELECT s.id FROM signups s
+    JOIN games g ON g.id = s.game_id
+    WHERE s.id = ? AND g.team_id = ?
+  `).get(req.params.id, team.id);
+  if (!signup) return res.redirect('/team/' + req.params.slug);
+  const phone = sanitizePhone(req.body.phone_number);
+  const carr = sanitizeCarrier(req.body.carrier);
+  db.prepare('UPDATE signups SET phone_number = ?, carrier = ? WHERE id = ?')
+    .run(phone, carr, req.params.id);
+  res.redirect('/team/' + req.params.slug);
+});
+
+// --- SMS Reminder System ---
+const smsTransporter = nodemailer.createTransport({ sendmail: true });
+
+async function sendSmsReminder(phone, carrier, teamName, gameDate, gameTime) {
+  const gateway = CARRIER_GATEWAYS[carrier];
+  if (!gateway || !phone) return;
+  const to = phone + '@' + gateway;
+  const [h, m] = gameTime.split(':');
+  const hr = parseInt(h);
+  const timeStr = (hr > 12 ? hr - 12 : (hr === 0 ? 12 : hr)) + (m !== '00' ? ':' + m : '') + (hr >= 12 ? 'PM' : 'AM');
+  const [y, mo, d] = gameDate.split('-');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const dateStr = months[parseInt(mo) - 1] + ' ' + parseInt(d);
+  const text = `Reminder: ${teamName} game tomorrow (${dateStr}) at ${timeStr}. Don't forget snacks!`;
+  try {
+    await smsTransporter.sendMail({ from: 'snacks@localhost', to, subject: '', text });
+  } catch (err) {
+    console.error('SMS send failed for', to, err.message);
+  }
+}
+
+// Run daily at 00:00 UTC = 5:00 PM MST (Arizona has no DST)
+cron.schedule('0 0 * * *', () => {
+  // "Tomorrow" in MST = UTC minus 7 hours, then add 1 day
+  const now = new Date();
+  const mstNow = new Date(now.getTime() - 7 * 60 * 60 * 1000);
+  const tomorrow = new Date(mstNow);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowStr = tomorrow.toISOString().slice(0, 10);
+
+  const rows = db.prepare(`
+    SELECT s.phone_number, s.carrier, t.name AS team_name, g.game_date, g.game_time
+    FROM signups s
+    JOIN games g ON g.id = s.game_id
+    JOIN teams t ON t.id = g.team_id
+    WHERE g.game_date = ? AND s.phone_number IS NOT NULL AND s.carrier IS NOT NULL
+  `).all(tomorrowStr);
+
+  for (const row of rows) {
+    sendSmsReminder(row.phone_number, row.carrier, row.team_name, row.game_date, row.game_time);
+  }
+  if (rows.length > 0) console.log(`Sent ${rows.length} SMS reminder(s) for ${tomorrowStr}`);
 });
 
 // --- Start server ---
