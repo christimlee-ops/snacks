@@ -12,6 +12,28 @@
 </div>
 
 <div class="card">
+  <h2>Players</h2>
+  <form method="POST" action="/admin/teams/<%= team.slug %>/players" class="inline-form" style="margin-bottom:1rem">
+    <input type="text" name="player_name" placeholder="Player name" required>
+    <button type="submit" class="btn btn-primary">Add Player</button>
+  </form>
+  <% if (players.length === 0) { %>
+    <p class="muted">No players added yet.</p>
+  <% } else { %>
+    <ul class="player-list">
+      <% for (const player of players) { %>
+        <li>
+          <span><%= player.player_name %></span>
+          <form method="POST" action="/admin/teams/<%= team.slug %>/players/<%= player.id %>/delete" style="display:inline">
+            <button type="submit" class="btn btn-small btn-danger" onclick="return confirm('Remove this player?')">Remove</button>
+          </form>
+        </li>
+      <% } %>
+    </ul>
+  <% } %>
+</div>
+
+<div class="card">
   <h2>Add Game</h2>
   <form method="POST" action="/admin/teams/<%= team.slug %>/games" class="game-form">
     <div class="form-row">
@@ -146,28 +168,6 @@
     </tbody>
   </table>
 <% } %>
-
-<div class="card">
-  <h2>Players</h2>
-  <form method="POST" action="/admin/teams/<%= team.slug %>/players" class="inline-form" style="margin-bottom:1rem">
-    <input type="text" name="player_name" placeholder="Player name" required>
-    <button type="submit" class="btn btn-primary">Add Player</button>
-  </form>
-  <% if (players.length === 0) { %>
-    <p class="muted">No players added yet.</p>
-  <% } else { %>
-    <ul class="player-list">
-      <% for (const player of players) { %>
-        <li>
-          <span><%= player.player_name %></span>
-          <form method="POST" action="/admin/teams/<%= team.slug %>/players/<%= player.id %>/delete" style="display:inline">
-            <button type="submit" class="btn btn-small btn-danger" onclick="return confirm('Remove this player?')">Remove</button>
-          </form>
-        </li>
-      <% } %>
-    </ul>
-  <% } %>
-</div>
 
 <div class="card">
   <h2>Team Details</h2>
