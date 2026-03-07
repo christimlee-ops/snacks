@@ -26,7 +26,7 @@
     <p class="muted text-center">No games scheduled yet. Check back soon!</p>
   <% } else { %>
     <% for (const game of games) { %>
-      <div class="card game-card <%= game.signups.length > 0 ? 'game-filled' : 'game-open' %>">
+      <div class="card game-card <%= game.signups.length > 0 ? 'game-filled' : 'game-open' %>" id="game-<%= game.id %>">
         <div class="game-info">
           <h3>
             <%= (() => { const [y,m,d] = game.game_date.split('-'); const months = ['January','February','March','April','May','June','July','August','September','October','November','December']; return months[parseInt(m)-1] + ' ' + parseInt(d); })() %> at <%= (() => { const [h,m] = game.game_time.split(':'); const hr = parseInt(h); return (hr > 12 ? hr - 12 : (hr === 0 ? 12 : hr)) + (m !== '00' ? ':' + m : '') + (hr >= 12 ? 'PM' : 'AM'); })() %>
@@ -51,6 +51,25 @@
               <button type="submit" class="btn btn-primary">Sign Up</button>
             </div>
           </form>
+        <% } %>
+
+        <% if (players.length > 0) { %>
+          <div class="rsvp-section">
+            <h4>Who's Coming?</h4>
+            <div class="rsvp-list">
+              <% let attending = 0; %>
+              <% for (const player of players) { %>
+                <% const isRsvped = rsvpSet.has(game.id + '-' + player.id); %>
+                <% if (isRsvped) attending++; %>
+                <form method="POST" action="/team/<%= team.slug %>/rsvp" style="display:inline">
+                  <input type="hidden" name="game_id" value="<%= game.id %>">
+                  <input type="hidden" name="player_id" value="<%= player.id %>">
+                  <button type="submit" class="rsvp-toggle <%= isRsvped ? 'rsvp-yes' : 'rsvp-no' %>"><%= isRsvped ? '✓ ' : '' %><%= player.player_name %></button>
+                </form>
+              <% } %>
+            </div>
+            <p class="rsvp-count"><%= attending %> / <%= players.length %> attending</p>
+          </div>
         <% } %>
       </div>
     <% } %>

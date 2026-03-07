@@ -55,7 +55,7 @@
         <th>Time</th>
         <th>Home/Away</th>
         <th>Field</th>
-        <th>Signed Up</th>
+        <th>Snack Signup</th>
         <th></th>
       </tr>
     </thead>
@@ -109,7 +109,7 @@
                 <div id="signup-display-<%= game.signup_id %>">
                   <div class="form-row" style="align-items:flex-end">
                     <div class="form-group">
-                      <label>Signed Up</label>
+                      <label>Snack Signup</label>
                       <input type="text" value="<%= game.parent_name %>" disabled>
                     </div>
                     <div class="form-group" style="display:flex;gap:0.5rem;padding-bottom:0.75rem">
@@ -123,7 +123,7 @@
                 <form method="POST" action="/admin/teams/<%= team.slug %>/signups/<%= game.signup_id %>/edit" id="signup-edit-<%= game.signup_id %>" hidden>
                   <div class="form-row" style="align-items:flex-end">
                     <div class="form-group">
-                      <label>Signed Up</label>
+                      <label>Snack Signup</label>
                       <input type="text" name="parent_name" value="<%= game.parent_name %>">
                     </div>
                     <div class="form-group" style="padding-bottom:0.75rem">
@@ -134,7 +134,7 @@
               <% } else { %>
                 <div class="form-row">
                   <div class="form-group">
-                    <label>Signed Up</label>
+                    <label>Snack Signup</label>
                     <input type="text" value="—" disabled>
                   </div>
                 </div>
@@ -146,6 +146,28 @@
     </tbody>
   </table>
 <% } %>
+
+<div class="card">
+  <h2>Players</h2>
+  <form method="POST" action="/admin/teams/<%= team.slug %>/players" class="inline-form" style="margin-bottom:1rem">
+    <input type="text" name="player_name" placeholder="Player name" required>
+    <button type="submit" class="btn btn-primary">Add Player</button>
+  </form>
+  <% if (players.length === 0) { %>
+    <p class="muted">No players added yet.</p>
+  <% } else { %>
+    <ul class="player-list">
+      <% for (const player of players) { %>
+        <li>
+          <span><%= player.player_name %></span>
+          <form method="POST" action="/admin/teams/<%= team.slug %>/players/<%= player.id %>/delete" style="display:inline">
+            <button type="submit" class="btn btn-small btn-danger" onclick="return confirm('Remove this player?')">Remove</button>
+          </form>
+        </li>
+      <% } %>
+    </ul>
+  <% } %>
+</div>
 
 <div class="card">
   <h2>Team Details</h2>

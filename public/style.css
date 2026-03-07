@@ -495,6 +495,76 @@ input:focus, select:focus {
   font-size: 1.1rem;
 }
 
+/* Player list (admin) */
+.player-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.player-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.player-list li:last-child {
+  border-bottom: none;
+}
+
+/* RSVP section (public) */
+.rsvp-section {
+  border-top: 1px solid #eee;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+}
+
+.rsvp-section h4 {
+  font-size: 0.95rem;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.rsvp-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.rsvp-toggle {
+  display: inline-block;
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.rsvp-yes {
+  background: #d4edda;
+  color: #155724;
+  border: 2px solid #2d6a4f;
+}
+
+.rsvp-no {
+  background: white;
+  color: #495057;
+  border: 2px solid #dee2e6;
+}
+
+.rsvp-no:hover {
+  border-color: #adb5bd;
+}
+
+.rsvp-count {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin-top: 0.5rem;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .form-row {
