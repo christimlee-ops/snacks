@@ -356,6 +356,12 @@ input:focus, select:focus {
   border: 1px solid #f5c6cb;
 }
 
+.badge-time {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffc107;
+}
+
 .badge-field {
   background: #d4edda;
   color: #155724;
