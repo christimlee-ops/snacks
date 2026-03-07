@@ -309,7 +309,6 @@ input:focus, select:focus {
   color: #1b4332;
   font-size: 0.85rem;
   font-weight: 700;
-  text-transform: uppercase;
   margin: 0 auto 0.75rem;
   padding: 0.25rem 0.75rem;
   background: #d8f3dc;
