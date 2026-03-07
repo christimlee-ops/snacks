@@ -190,6 +190,17 @@
         <input type="text" id="team_season" name="season" value="<%= team.season || '' %>" placeholder="e.g. Spring 2026">
       </div>
     </div>
+    <div class="form-group">
+      <label for="team_banner_color">Banner Color</label>
+      <div style="display:flex;align-items:center;gap:0.75rem">
+        <input type="color" id="team_banner_color" name="banner_color" value="<%= team.banner_color || '#2d6a4f' %>" style="width:50px;height:38px;padding:2px;border:2px solid #dee2e6;border-radius:6px;cursor:pointer">
+        <span id="color-hex" style="font-size:0.9rem;color:#6c757d"><%= team.banner_color || '#2d6a4f' %></span>
+        <% if (team.banner_color) { %>
+          <button type="button" class="btn btn-small btn-outline" onclick="document.getElementById('team_banner_color').value='#2d6a4f';document.getElementById('color-hex').textContent='#2d6a4f'">Reset</button>
+        <% } %>
+      </div>
+    </div>
+    <script>document.getElementById('team_banner_color').addEventListener('input', function(){ document.getElementById('color-hex').textContent = this.value; });</script>
     <button type="submit" class="btn btn-primary">Save</button>
   </form>
 </div>

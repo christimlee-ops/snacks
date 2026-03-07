@@ -22,6 +22,8 @@ try { db.exec('ALTER TABLE teams ADD COLUMN description TEXT'); } catch (e) { /*
 // Migrate: add grade and season columns if missing
 try { db.exec('ALTER TABLE teams ADD COLUMN grade TEXT'); } catch (e) { /* already exists */ }
 try { db.exec('ALTER TABLE teams ADD COLUMN season TEXT'); } catch (e) { /* already exists */ }
+// Migrate: add banner_color column if missing
+try { db.exec('ALTER TABLE teams ADD COLUMN banner_color TEXT'); } catch (e) { /* already exists */ }
 
 // Players & RSVPs tables
 db.exec(`CREATE TABLE IF NOT EXISTS players (
@@ -150,13 +152,13 @@ app.post('/admin/teams', requireAdmin, (req, res) => {
 app.post('/admin/teams/:slug/edit', requireAdmin, (req, res) => {
   const team = db.prepare('SELECT * FROM teams WHERE slug = ?').get(req.params.slug);
   if (!team) return res.status(404).send('Team not found');
-  const { name, description, grade, season } = req.body;
+  const { name, description, grade, season, banner_color } = req.body;
   if (!name || !name.trim()) return res.redirect('/admin/teams/' + req.params.slug);
   const newSlug = slugify(name.trim());
   const conflict = db.prepare('SELECT id FROM teams WHERE slug = ? AND id != ?').get(newSlug, team.id);
   if (conflict) return res.redirect('/admin/teams/' + req.params.slug);
-  db.prepare('UPDATE teams SET name = ?, slug = ?, description = ?, grade = ?, season = ? WHERE id = ?')
-    .run(name.trim(), newSlug, (description || '').trim() || null, (grade || '').trim() || null, (season || '').trim() || null, team.id);
+  db.prepare('UPDATE teams SET name = ?, slug = ?, description = ?, grade = ?, season = ?, banner_color = ? WHERE id = ?')
+    .run(name.trim(), newSlug, (description || '').trim() || null, (grade || '').trim() || null, (season || '').trim() || null, (banner_color || '').trim() || null, team.id);
   res.redirect('/admin/teams/' + newSlug);
 });
 
@@ -206,7 +208,19 @@ app.post('/admin/teams/:slug/games/:id/delete', requireAdmin, (req, res) => {
 });
 
 // Upload logo
-app.post('/admin/teams/:slug/logo', requireAdmin, upload.single('logo'), (req, res) => {
+app.post('/admin/teams/:slug/logo', requireAdmin, (req, res, next) => {
+  // Delete old logo files for this team before multer saves the new one
+  const uploadsDir = path.join(__dirname, 'uploads');
+  try {
+    const files = fs.readdirSync(uploadsDir);
+    for (const f of files) {
+      if (f.startsWith(req.params.slug + '-logo')) {
+        fs.unlinkSync(path.join(uploadsDir, f));
+      }
+    }
+  } catch (e) { /* ignore */ }
+  next();
+}, upload.single('logo'), (req, res) => {
   if (!req.file) return res.redirect('/admin/teams/' + req.params.slug);
   const logoPath = '/uploads/' + req.file.filename;
   db.prepare('UPDATE teams SET logo_path = ? WHERE slug = ?').run(logoPath, req.params.slug);
