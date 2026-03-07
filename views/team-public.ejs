@@ -42,35 +42,6 @@
         <% if (game.signups.length > 0) { %>
           <div class="signups-list">
             <h4>Signed up: <%= game.signups[0].parent_name %></h4>
-            <% const su = game.signups[0]; %>
-            <% if (su.phone_number && su.carrier) { %>
-              <p style="font-size:0.85rem;color:#6c757d;margin-top:0.25rem">Text reminder on</p>
-            <% } else { %>
-              <button type="button" class="btn btn-small btn-outline" style="margin-top:0.5rem" onclick="document.getElementById('phone-edit-<%= su.id %>').toggleAttribute('hidden')">
-                Add Phone for Reminders
-              </button>
-              <form method="POST" action="/team/<%= team.slug %>/signup/<%= su.id %>/phone" id="phone-edit-<%= su.id %>" hidden style="margin-top:0.5rem">
-                <div class="phone-row">
-                  <div class="form-group">
-                    <input type="tel" name="phone_number" placeholder="(555) 123-4567">
-                  </div>
-                  <div class="form-group">
-                    <select name="carrier">
-                      <option value="">Carrier</option>
-                      <option value="att">AT&T</option>
-                      <option value="tmobile">T-Mobile</option>
-                      <option value="verizon">Verizon</option>
-                      <option value="cricket">Cricket</option>
-                      <option value="metro">Metro by T-Mobile</option>
-                      <option value="uscellular">US Cellular</option>
-                      <option value="boost">Boost Mobile</option>
-                      <option value="mint">Mint Mobile</option>
-                    </select>
-                  </div>
-                  <button type="submit" class="btn btn-small btn-primary">Save</button>
-                </div>
-              </form>
-            <% } %>
           </div>
         <% } else { %>
           <form method="POST" action="/team/<%= team.slug %>/signup" class="signup-form">
@@ -78,24 +49,6 @@
             <div class="form-row">
               <input type="text" name="parent_name" placeholder="Your name" required>
               <button type="submit" class="btn btn-primary">Sign Up</button>
-            </div>
-            <div class="phone-row">
-              <div class="form-group">
-                <input type="tel" name="phone_number" placeholder="Phone (optional)">
-              </div>
-              <div class="form-group">
-                <select name="carrier">
-                  <option value="">Carrier</option>
-                  <option value="att">AT&T</option>
-                  <option value="tmobile">T-Mobile</option>
-                  <option value="verizon">Verizon</option>
-                  <option value="cricket">Cricket</option>
-                  <option value="metro">Metro by T-Mobile</option>
-                  <option value="uscellular">US Cellular</option>
-                  <option value="boost">Boost Mobile</option>
-                  <option value="mint">Mint Mobile</option>
-                </select>
-              </div>
             </div>
           </form>
         <% } %>
