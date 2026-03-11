@@ -24,6 +24,8 @@ try { db.exec('ALTER TABLE teams ADD COLUMN grade TEXT'); } catch (e) { /* alrea
 try { db.exec('ALTER TABLE teams ADD COLUMN season TEXT'); } catch (e) { /* already exists */ }
 // Migrate: add banner_color column if missing
 try { db.exec('ALTER TABLE teams ADD COLUMN banner_color TEXT'); } catch (e) { /* already exists */ }
+// Migrate: add game_result column if missing
+try { db.exec('ALTER TABLE games ADD COLUMN game_result TEXT'); } catch (e) { /* already exists */ }
 
 // Players & RSVPs tables
 db.exec(`CREATE TABLE IF NOT EXISTS players (
@@ -196,6 +198,18 @@ app.post('/admin/teams/:slug/games/:id/edit', requireAdmin, (req, res) => {
   if (!game_date || !game_time || !home_away) return res.redirect('/admin/teams/' + req.params.slug);
   db.prepare('UPDATE games SET game_date = ?, game_time = ?, home_away = ?, field_number = ? WHERE id = ? AND team_id = ?')
     .run(game_date, game_time, home_away, field_number || null, req.params.id, team.id);
+  res.redirect('/admin/teams/' + req.params.slug);
+});
+
+// Set game result
+app.post('/admin/teams/:slug/games/:id/result', requireAdmin, (req, res) => {
+  const team = db.prepare('SELECT * FROM teams WHERE slug = ?').get(req.params.slug);
+  if (!team) return res.status(404).send('Team not found');
+  const { game_result } = req.body;
+  const valid = ['win', 'loss', 'tie', ''];
+  if (!valid.includes(game_result || '')) return res.redirect('/admin/teams/' + req.params.slug);
+  db.prepare('UPDATE games SET game_result = ? WHERE id = ? AND team_id = ?')
+    .run((game_result || '').trim() || null, req.params.id, team.id);
   res.redirect('/admin/teams/' + req.params.slug);
 });
 

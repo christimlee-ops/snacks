@@ -78,6 +78,7 @@
         <th>Home/Away</th>
         <th>Field</th>
         <th>Snack Signup</th>
+        <th>Result</th>
         <th></th>
       </tr>
     </thead>
@@ -89,6 +90,16 @@
           <td><%= game.home_away === 'home' ? 'Home' : 'Away' %></td>
           <td><%= game.field_number || '—' %></td>
           <td><%= game.parent_name || '—' %></td>
+          <td>
+            <form method="POST" action="/admin/teams/<%= team.slug %>/games/<%= game.id %>/result" style="display:inline">
+              <select name="game_result" onchange="this.form.submit()" style="width:auto;margin:0;padding:0.2rem 0.4rem;font-size:0.85rem">
+                <option value="">—</option>
+                <option value="win" <%= game.game_result === 'win' ? 'selected' : '' %>>Win</option>
+                <option value="loss" <%= game.game_result === 'loss' ? 'selected' : '' %>>Loss</option>
+                <option value="tie" <%= game.game_result === 'tie' ? 'selected' : '' %>>Tie</option>
+              </select>
+            </form>
+          </td>
           <td style="white-space:nowrap">
             <button type="button" class="btn btn-small btn-outline" onclick="document.getElementById('edit-<%= game.id %>').toggleAttribute('hidden')">Edit</button>
             <form method="POST" action="/admin/teams/<%= team.slug %>/games/<%= game.id %>/delete" style="display:inline">
