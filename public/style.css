@@ -327,6 +327,42 @@ input:focus, select:focus {
   border-left: 4px solid #e8a838;
 }
 
+.game-card.past-game {
+  padding: 0.75rem 1.5rem;
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.game-card.past-game .game-card-body {
+  display: none;
+}
+
+.game-card.past-game .game-info h3 {
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+
+.game-card.past-game .game-badges {
+  display: none;
+}
+
+.game-card.past-game.expanded {
+  padding: 1.5rem;
+  opacity: 1;
+}
+
+.game-card.past-game.expanded .game-card-body {
+  display: block;
+}
+
+.game-card.past-game.expanded .game-badges {
+  display: flex;
+}
+
+.game-card.past-game.expanded .game-info h3 {
+  font-size: inherit;
+}
+
 .game-info h3 {
   display: flex;
   align-items: center;

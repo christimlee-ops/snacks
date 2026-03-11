@@ -26,7 +26,7 @@
     <p class="muted text-center">No games scheduled yet. Check back soon!</p>
   <% } else { %>
     <% for (const game of games) { %>
-      <div class="card game-card <%= game.signups.length > 0 ? 'game-filled' : 'game-open' %>" id="game-<%= game.id %>">
+      <div class="card game-card <%= game.signups.length > 0 ? 'game-filled' : 'game-open' %>" id="game-<%= game.id %>" data-game-date="<%= game.game_date %>">
         <div class="game-info">
           <h3>
             <%= (() => { const [y,m,d] = game.game_date.split('-'); const months = ['January','February','March','April','May','June','July','August','September','October','November','December']; return months[parseInt(m)-1] + ' ' + parseInt(d); })() %>
@@ -40,6 +40,7 @@
           </div>
         </div>
 
+        <div class="game-card-body">
         <% if (game.signups.length > 0) { %>
           <div class="signups-list">
             <h4>Snack Signup: <%= game.signups[0].parent_name %></h4>
@@ -71,10 +72,30 @@
             </div>
           </div>
         <% } %>
+        </div>
       </div>
     <% } %>
   <% } %>
 </div>
+
+<script>
+(function() {
+  var today = new Date();
+  today.setHours(0, 0, 0, 0);
+  var yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  document.querySelectorAll('.game-card[data-game-date]').forEach(function(card) {
+    var parts = card.getAttribute('data-game-date').split('-');
+    var gameDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    if (gameDate < yesterday) {
+      card.classList.add('past-game');
+      card.addEventListener('click', function() {
+        card.classList.toggle('expanded');
+      });
+    }
+  });
+})();
+</script>
 
 <% if (team.banner_color) { %>
 <script>document.querySelector('.navbar').style.background = '<%= team.banner_color %>';</script>
