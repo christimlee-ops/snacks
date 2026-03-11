@@ -360,7 +360,8 @@ input:focus, select:focus {
 }
 
 .game-card.past-game.expanded .game-info h3 {
-  font-size: inherit;
+  font-size: revert;
+  margin-bottom: 0.5rem;
 }
 
 .game-card.past-game.expanded .badge-result-win,
