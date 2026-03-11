@@ -363,6 +363,12 @@ input:focus, select:focus {
   font-size: inherit;
 }
 
+.game-card.past-game.expanded .badge-result-win,
+.game-card.past-game.expanded .badge-result-loss,
+.game-card.past-game.expanded .badge-result-tie {
+  display: none;
+}
+
 .game-info h3 {
   display: flex;
   align-items: center;
