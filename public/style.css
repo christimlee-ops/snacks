@@ -364,11 +364,6 @@ input:focus, select:focus {
   margin-bottom: 0.5rem;
 }
 
-.game-card.past-game.expanded .badge-result-win,
-.game-card.past-game.expanded .badge-result-loss,
-.game-card.past-game.expanded .badge-result-tie {
-  display: none;
-}
 
 .game-info h3 {
   display: flex;
