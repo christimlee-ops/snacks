@@ -25,7 +25,6 @@
   <% if (games.length === 0) { %>
     <p class="muted text-center">No games scheduled yet. Check back soon!</p>
   <% } else { %>
-    <button class="past-games-toggle" id="pastGamesToggle">Show Past Games</button>
     <% for (const game of games) { %>
       <div class="card game-card <%= game.signups.length > 0 ? 'game-filled' : 'game-open' %>" id="game-<%= game.id %>" data-game-date="<%= game.game_date %>">
         <div class="game-info">
@@ -88,27 +87,16 @@
   today.setHours(0, 0, 0, 0);
   var yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
-  var hasPast = false;
   document.querySelectorAll('.game-card[data-game-date]').forEach(function(card) {
     var parts = card.getAttribute('data-game-date').split('-');
     var gameDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
     if (gameDate < yesterday) {
-      hasPast = true;
       card.classList.add('past-game');
       card.addEventListener('click', function() {
         card.classList.toggle('expanded');
       });
     }
   });
-  var toggle = document.getElementById('pastGamesToggle');
-  if (hasPast) {
-    toggle.classList.add('has-past-games');
-    toggle.addEventListener('click', function() {
-      var container = document.querySelector('.public-team');
-      var showing = container.classList.toggle('past-games-visible');
-      toggle.textContent = showing ? 'Hide Past Games' : 'Show Past Games';
-    });
-  }
 })();
 </script>
 
