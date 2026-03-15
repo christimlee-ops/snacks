@@ -141,12 +141,12 @@ app.get('/admin', requireAdmin, (req, res) => {
 
 // Create team
 app.post('/admin/teams', requireAdmin, (req, res) => {
-  const { name } = req.body;
-  if (!name || !name.trim()) return res.redirect('/admin');
-  const slug = slugify(name.trim());
+  const { name, season } = req.body;
+  if (!name || !name.trim() || !season || !season.trim()) return res.redirect('/admin');
+  const slug = slugify(name.trim() + ' ' + season.trim());
   const existing = db.prepare('SELECT id FROM teams WHERE slug = ?').get(slug);
   if (existing) return res.redirect('/admin');
-  db.prepare('INSERT INTO teams (name, slug) VALUES (?, ?)').run(name.trim(), slug);
+  db.prepare('INSERT INTO teams (name, slug, season) VALUES (?, ?, ?)').run(name.trim(), slug, season.trim());
   res.redirect('/admin/teams/' + slug);
 });
 
@@ -154,9 +154,9 @@ app.post('/admin/teams', requireAdmin, (req, res) => {
 app.post('/admin/teams/:slug/edit', requireAdmin, (req, res) => {
   const team = db.prepare('SELECT * FROM teams WHERE slug = ?').get(req.params.slug);
   if (!team) return res.status(404).send('Team not found');
-  const { name, description, grade, season, banner_color } = req.body;
+  const { name, description, grade, season, banner_color, slug } = req.body;
   if (!name || !name.trim()) return res.redirect('/admin/teams/' + req.params.slug);
-  const newSlug = slugify(name.trim());
+  const newSlug = slug && slug.trim() ? slugify(slug.trim()) : slugify(name.trim());
   const conflict = db.prepare('SELECT id FROM teams WHERE slug = ? AND id != ?').get(newSlug, team.id);
   if (conflict) return res.redirect('/admin/teams/' + req.params.slug);
   db.prepare('UPDATE teams SET name = ?, slug = ?, description = ?, grade = ?, season = ?, banner_color = ? WHERE id = ?')

@@ -188,6 +188,13 @@
       <input type="text" id="team_name" name="name" value="<%= team.name %>" required>
     </div>
     <div class="form-group">
+      <label for="team_slug">URL</label>
+      <div style="display:flex;align-items:center;gap:0.25rem">
+        <span style="color:#6c757d;font-size:0.9rem;white-space:nowrap">/team/</span>
+        <input type="text" id="team_slug" name="slug" value="<%= team.slug %>" required style="margin-bottom:0">
+      </div>
+    </div>
+    <div class="form-group">
       <label for="team_description">Description</label>
       <input type="text" id="team_description" name="description" value="<%= team.description || '' %>" placeholder="e.g. U10 boys soccer, Fall 2026">
     </div>
