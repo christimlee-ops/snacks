@@ -221,6 +221,11 @@
     <script>document.getElementById('team_banner_color').addEventListener('input', function(){ document.getElementById('color-hex').textContent = this.value; });</script>
     <button type="submit" class="btn btn-primary">Save</button>
   </form>
+  <div style="border-top:1px solid #eee;margin-top:1rem;padding-top:1rem">
+    <form method="POST" action="/admin/teams/<%= team.slug %>/delete" id="delete-team-form">
+      <button type="button" class="btn btn-danger" onclick="if(confirm('Are you sure you want to delete this team? All games, signups, players, and RSVPs will be permanently deleted.')) document.getElementById('delete-team-form').submit()">Delete Team</button>
+    </form>
+  </div>
 </div>
 
 <div class="card">

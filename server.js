@@ -164,6 +164,18 @@ app.post('/admin/teams/:slug/edit', requireAdmin, (req, res) => {
   res.redirect('/admin/teams/' + newSlug);
 });
 
+// Delete team
+app.post('/admin/teams/:slug/delete', requireAdmin, (req, res) => {
+  const team = db.prepare('SELECT * FROM teams WHERE slug = ?').get(req.params.slug);
+  if (!team) return res.status(404).send('Team not found');
+  db.prepare('DELETE FROM rsvps WHERE game_id IN (SELECT id FROM games WHERE team_id = ?)').run(team.id);
+  db.prepare('DELETE FROM signups WHERE game_id IN (SELECT id FROM games WHERE team_id = ?)').run(team.id);
+  db.prepare('DELETE FROM games WHERE team_id = ?').run(team.id);
+  db.prepare('DELETE FROM players WHERE team_id = ?').run(team.id);
+  db.prepare('DELETE FROM teams WHERE id = ?').run(team.id);
+  res.redirect('/admin');
+});
+
 // Admin team page
 app.get('/admin/teams/:slug', requireAdmin, (req, res) => {
   const team = db.prepare('SELECT * FROM teams WHERE slug = ?').get(req.params.slug);
