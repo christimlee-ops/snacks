@@ -85,12 +85,10 @@
 (function() {
   var today = new Date();
   today.setHours(0, 0, 0, 0);
-  var yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
   document.querySelectorAll('.game-card[data-game-date]').forEach(function(card) {
     var parts = card.getAttribute('data-game-date').split('-');
     var gameDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-    if (gameDate < yesterday) {
+    if (gameDate < today) {
       card.classList.add('past-game');
       card.addEventListener('click', function() {
         card.classList.toggle('expanded');
