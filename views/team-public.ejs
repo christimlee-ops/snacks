@@ -1,4 +1,4 @@
-<% const title = team.name; %>
+<% const title = [team.name, team.grade, team.season].filter(Boolean).join(' · '); %>
 <%- include('layout') %>
 
 <div class="public-team">

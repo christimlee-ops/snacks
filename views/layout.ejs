@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= typeof title !== 'undefined' ? title + ' | ' : '' %>Snack Signup</title>
+  <title><%= typeof title !== 'undefined' ? title + ' | ' : '' %>Team Site & Snack Signup</title>
   <% if (typeof ogImage !== 'undefined' && ogImage) { %>
     <meta property="og:image" content="<%= ogImage %>">
-    <meta property="og:title" content="<%= typeof title !== 'undefined' ? title : 'Snack Signup' %>">
+    <meta property="og:title" content="<%= typeof title !== 'undefined' ? title : 'Team Site & Snack Signup' %>">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:image" content="<%= ogImage %>">
   <% } %>
@@ -15,7 +15,7 @@
 </head>
 <body>
   <nav class="navbar">
-    <a href="/" class="nav-brand">Snack Signup</a>
+    <a href="/" class="nav-brand">Team Site & Snack Signup</a>
     <% if (admin) { %>
       <div class="nav-links">
         <a href="/admin">Dashboard</a>
