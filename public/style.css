@@ -666,6 +666,20 @@ input:focus, select:focus {
     flex-direction: column;
   }
 
+  .signup-form .form-row {
+    flex-direction: row;
+  }
+
+  .signup-form input {
+    font-size: 0.85rem;
+  }
+
+  .signup-form .btn {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.6rem;
+    white-space: nowrap;
+  }
+
   .inline-form {
     flex-direction: column;
     align-items: stretch;
