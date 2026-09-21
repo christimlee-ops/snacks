@@ -49,7 +49,7 @@
         <div class="game-card-body">
         <% if (game.signups.length > 0) { %>
           <div class="signups-list">
-            <h4>Snack Signup: <%= game.signups[0].parent_name %></h4>
+            <span class="snack-signup-pill">🍎 Snacks: <%= game.signups[0].parent_name %></span>
           </div>
         <% } else { %>
           <form method="POST" action="/team/<%= team.slug %>/signup" class="signup-form">
