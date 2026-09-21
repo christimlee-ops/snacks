@@ -10,7 +10,7 @@
   <h1 class="text-center"><%= team.name %></h1>
   <% if (team.grade || team.season) { %>
     <div class="team-meta">
-      <% if (team.grade) { %><span class="badge badge-field"><%= team.grade %></span><% } %>
+      <% if (team.grade) { %><span class="badge badge-field"><%= team.grade %> Grade</span><% } %>
       <% if (team.season) { %><span class="badge badge-home"><%= team.season %></span><% } %>
     </div>
   <% } %>
