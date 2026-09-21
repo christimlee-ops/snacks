@@ -649,7 +649,7 @@ input:focus, select:focus {
 .public-team .team-meta .badge {
   background: color-mix(in srgb, var(--team-color, #2d6a4f) 12%, white);
   border-color: color-mix(in srgb, var(--team-color, #2d6a4f) 35%, white);
-  color: var(--team-color, #155724);
+  color: color-mix(in srgb, var(--team-color, #2d6a4f) 80%, black);
 }
 
 .rsvp-yes {
