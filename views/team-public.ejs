@@ -8,23 +8,17 @@
     </div>
   <% } %>
   <h1 class="text-center"><%= team.name %></h1>
-  <% if (team.grade || team.season) { %>
+  <% if (team.grade || team.season || coaches.length > 0) { %>
     <div class="team-meta">
       <% if (team.grade) { %><span class="badge badge-field"><%= team.grade %> Grade</span><% } %>
       <% if (team.season) { %><span class="badge badge-home"><%= team.season %></span><% } %>
+      <% const headCoach = coaches.find(c => c.role === 'head'); %>
+      <% if (headCoach) { %><span class="badge badge-coach">Coach <%= headCoach.coach_name %></span><% } %>
+      <% for (const c of coaches.filter(c => c.role === 'assistant')) { %><span class="badge badge-coach-asst"><%= c.coach_name %></span><% } %>
     </div>
   <% } %>
   <% if (team.description) { %>
     <div class="team-description"><%= team.description %></div>
-  <% } %>
-
-  <% if (coaches.length > 0) { %>
-    <div class="coaches-list">
-      <% const headCoach = coaches.find(c => c.role === 'head'); %>
-      <% const assistants = coaches.filter(c => c.role === 'assistant'); %>
-      <% if (headCoach) { %><span class="coach-item"><strong>Head Coach:</strong> <%= headCoach.coach_name %></span><% } %>
-      <% for (const c of assistants) { %><span class="coach-item"><strong>Assistant:</strong> <%= c.coach_name %></span><% } %>
-    </div>
   <% } %>
 
   <% if (success) { %>

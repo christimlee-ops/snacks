@@ -304,22 +304,6 @@ input:focus, select:focus {
   margin-bottom: 0.75rem;
 }
 
-.coaches-list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-bottom: 1.25rem;
-}
-
-.coach-item {
-  background: color-mix(in srgb, var(--team-color, #2d6a4f) 8%, white);
-  border: 1px solid color-mix(in srgb, var(--team-color, #2d6a4f) 25%, white);
-  color: #333;
-  border-radius: 20px;
-  padding: 0.3rem 0.85rem;
-  font-size: 0.9rem;
-}
 
 .team-description {
   text-align: center;
@@ -423,6 +407,18 @@ input:focus, select:focus {
   background: #d4edda;
   color: #155724;
   border: 1px solid #a3d9b1;
+}
+
+.badge-coach {
+  background: color-mix(in srgb, var(--team-color, #2d6a4f) 15%, white);
+  color: color-mix(in srgb, var(--team-color, #2d6a4f) 80%, black);
+  border: 1px solid color-mix(in srgb, var(--team-color, #2d6a4f) 35%, white);
+}
+
+.badge-coach-asst {
+  background: #f8f9fa;
+  color: #495057;
+  border: 1px solid #dee2e6;
 }
 
 .badge-result-win {
