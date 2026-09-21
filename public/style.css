@@ -632,7 +632,7 @@ input:focus, select:focus {
 
 /* Team color theming on public page */
 .public-team h1 {
-  color: var(--team-color, #1b4332);
+  color: color-mix(in srgb, var(--team-color, #2d6a4f) 80%, black);
 }
 
 .public-team .btn-primary {
