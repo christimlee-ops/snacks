@@ -668,6 +668,7 @@ input:focus, select:focus {
 
   .signup-form .form-row {
     flex-direction: row;
+    flex-wrap: nowrap;
   }
 
   .signup-form input {
