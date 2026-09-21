@@ -320,12 +320,12 @@ input:focus, select:focus {
 }
 
 .game-card.game-filled {
-  border-left: 4px solid #2d6a4f;
-  border-left-color: var(--team-color, #2d6a4f);
+  border-left: 4px solid color-mix(in srgb, var(--team-color, #2d6a4f) 75%, black);
 }
 
 .game-card.game-open {
-  border-left: 4px solid #e8a838;
+  border-left: 4px solid color-mix(in srgb, var(--team-color, #2d6a4f) 45%, white);
+  background: color-mix(in srgb, var(--team-color, #2d6a4f) 6%, white);
 }
 
 .game-card.past-game {
