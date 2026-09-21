@@ -5,6 +5,7 @@ const multer = require('multer');
 const bcrypt = require('bcrypt');
 const path = require('path');
 const fs = require('fs');
+const { randomUUID } = require('crypto');
 
 const app = express();
 const PORT = 3000;
@@ -26,6 +27,11 @@ try { db.exec('ALTER TABLE teams ADD COLUMN season TEXT'); } catch (e) { /* alre
 try { db.exec('ALTER TABLE teams ADD COLUMN banner_color TEXT'); } catch (e) { /* already exists */ }
 // Migrate: add game_result column if missing
 try { db.exec('ALTER TABLE games ADD COLUMN game_result TEXT'); } catch (e) { /* already exists */ }
+// Migrate: add guid column if missing, backfill existing teams
+try { db.exec('ALTER TABLE teams ADD COLUMN guid TEXT'); } catch (e) { /* already exists */ }
+const teamsWithoutGuid = db.prepare('SELECT id FROM teams WHERE guid IS NULL').all();
+const updateGuid = db.prepare('UPDATE teams SET guid = ? WHERE id = ?');
+for (const t of teamsWithoutGuid) updateGuid.run(randomUUID(), t.id);
 
 // Coaches table
 db.exec(`CREATE TABLE IF NOT EXISTS coaches (
@@ -155,7 +161,7 @@ app.post('/admin/teams', requireAdmin, (req, res) => {
   const slug = slugify(name.trim() + ' ' + season.trim());
   const existing = db.prepare('SELECT id FROM teams WHERE slug = ?').get(slug);
   if (existing) return res.redirect('/admin');
-  db.prepare('INSERT INTO teams (name, slug, season) VALUES (?, ?, ?)').run(name.trim(), slug, season.trim());
+  db.prepare('INSERT INTO teams (name, slug, season, guid) VALUES (?, ?, ?, ?)').run(name.trim(), slug, season.trim(), randomUUID());
   res.redirect('/admin/teams/' + slug);
 });
 
@@ -356,6 +362,13 @@ app.get('/team/:slug', (req, res) => {
     ? req.protocol + '://' + req.get('host') + team.logo_path
     : null;
   res.render('team-public', { team, games, players, coaches, rsvpSet, success: req.query.success, ogImage });
+});
+
+// Permanent GUID-based team URL (redirects to slug URL)
+app.get('/team/id/:guid', (req, res) => {
+  const team = db.prepare('SELECT slug FROM teams WHERE guid = ?').get(req.params.guid);
+  if (!team) return res.status(404).send('Team not found');
+  res.redirect('/team/' + team.slug);
 });
 
 // Snack signup
