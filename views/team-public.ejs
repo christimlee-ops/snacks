@@ -13,8 +13,8 @@
       <% if (team.grade) { %><span class="badge badge-field"><%= team.grade %> Grade</span><% } %>
       <% if (team.season) { %><span class="badge badge-home"><%= team.season %></span><% } %>
       <% const headCoach = coaches.find(c => c.role === 'head'); %>
-      <% if (headCoach) { %><span class="badge badge-coach"><%= headCoach.coach_name %> (H)</span><% } %>
-      <% for (const c of coaches.filter(c => c.role === 'assistant')) { %><span class="badge badge-coach-asst"><%= c.coach_name %> (A)</span><% } %>
+      <% if (headCoach) { %><span class="badge badge-coach">Coach <%= headCoach.coach_name %> (H)</span><% } %>
+      <% for (const c of coaches.filter(c => c.role === 'assistant')) { %><span class="badge badge-coach-asst">Coach <%= c.coach_name %> (A)</span><% } %>
     </div>
   <% } %>
   <% if (team.description) { %>
