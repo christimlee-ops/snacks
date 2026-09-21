@@ -321,6 +321,7 @@ input:focus, select:focus {
 
 .game-card.game-filled {
   border-left: 4px solid #2d6a4f;
+  border-left-color: var(--team-color, #2d6a4f);
 }
 
 .game-card.game-open {
@@ -597,6 +598,7 @@ input:focus, select:focus {
   background: #d4edda;
   color: #155724;
   border: 2px solid #2d6a4f;
+  border-color: var(--team-color, #2d6a4f);
 }
 
 .rsvp-no {
@@ -613,6 +615,16 @@ input:focus, select:focus {
   font-size: 0.85rem;
   font-weight: 400;
   color: #6c757d;
+}
+
+/* Team color theming on public page */
+.public-team h1 {
+  color: var(--team-color, #1b4332);
+}
+
+.public-team .btn-primary {
+  background: var(--team-color, #2d6a4f);
+  border-color: var(--team-color, #2d6a4f);
 }
 
 /* Responsive */

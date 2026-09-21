@@ -1,7 +1,7 @@
 <% const title = [team.name, team.grade, team.season].filter(Boolean).join(' · '); %>
 <%- include('layout') %>
 
-<div class="public-team">
+<div class="public-team" style="--team-color: <%= team.banner_color || '#2d6a4f' %>">
   <% if (team.logo_path) { %>
     <div class="logo-center">
       <img src="<%= team.logo_path %>" alt="<%= team.name %> logo" class="team-logo-large">
@@ -99,7 +99,10 @@
 </script>
 
 <% if (team.banner_color) { %>
-<script>document.querySelector('.navbar').style.background = '<%= team.banner_color %>';</script>
+<script>
+document.querySelector('.navbar').style.background = '<%= team.banner_color %>';
+document.querySelector('.public-team').style.setProperty('--team-color', '<%= team.banner_color %>');
+</script>
 <% } else if (team.logo_path) { %>
 <script>
 (function() {
@@ -133,7 +136,9 @@
     var dr = Math.max(0, Math.round(dominant[0] * 0.7));
     var dg = Math.max(0, Math.round(dominant[1] * 0.7));
     var db = Math.max(0, Math.round(dominant[2] * 0.7));
-    document.querySelector('.navbar').style.background = 'rgb(' + dr + ',' + dg + ',' + db + ')';
+    var color = 'rgb(' + dr + ',' + dg + ',' + db + ')';
+    document.querySelector('.navbar').style.background = color;
+    document.querySelector('.public-team').style.setProperty('--team-color', color);
   }
   if (img.complete) applyColor();
   else img.addEventListener('load', applyColor);
