@@ -628,7 +628,7 @@ input:focus, select:focus {
 }
 
 .public-team .team-description {
-  color: var(--team-color, #1b4332);
+  color: color-mix(in srgb, var(--team-color, #2d6a4f) 80%, black);
   background: color-mix(in srgb, var(--team-color, #2d6a4f) 10%, white);
   border-color: color-mix(in srgb, var(--team-color, #2d6a4f) 35%, white);
 }
