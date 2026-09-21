@@ -18,6 +18,15 @@
     <div class="team-description"><%= team.description %></div>
   <% } %>
 
+  <% if (coaches.length > 0) { %>
+    <div class="coaches-list">
+      <% const headCoach = coaches.find(c => c.role === 'head'); %>
+      <% const assistants = coaches.filter(c => c.role === 'assistant'); %>
+      <% if (headCoach) { %><span class="coach-item"><strong>Head Coach:</strong> <%= headCoach.coach_name %></span><% } %>
+      <% for (const c of assistants) { %><span class="coach-item"><strong>Assistant:</strong> <%= c.coach_name %></span><% } %>
+    </div>
+  <% } %>
+
   <% if (success) { %>
     <div class="success-msg">Thanks for signing up to bring snacks!</div>
   <% } %>

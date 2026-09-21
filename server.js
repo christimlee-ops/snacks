@@ -27,6 +27,15 @@ try { db.exec('ALTER TABLE teams ADD COLUMN banner_color TEXT'); } catch (e) { /
 // Migrate: add game_result column if missing
 try { db.exec('ALTER TABLE games ADD COLUMN game_result TEXT'); } catch (e) { /* already exists */ }
 
+// Coaches table
+db.exec(`CREATE TABLE IF NOT EXISTS coaches (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  team_id INTEGER NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+  coach_name TEXT NOT NULL,
+  role TEXT NOT NULL CHECK(role IN ('head', 'assistant')),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+)`);
+
 // Players & RSVPs tables
 db.exec(`CREATE TABLE IF NOT EXISTS players (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -188,7 +197,8 @@ app.get('/admin/teams/:slug', requireAdmin, (req, res) => {
     ORDER BY g.game_date, g.game_time
   `).all(team.id);
   const players = db.prepare('SELECT * FROM players WHERE team_id = ? ORDER BY player_name').all(team.id);
-  res.render('admin-team', { team, games, players });
+  const coaches = db.prepare('SELECT * FROM coaches WHERE team_id = ? ORDER BY role DESC, coach_name').all(team.id);
+  res.render('admin-team', { team, games, players, coaches });
 });
 
 // Add game
@@ -289,6 +299,24 @@ app.post('/admin/teams/:slug/players/:id/delete', requireAdmin, (req, res) => {
   res.redirect('/admin/teams/' + req.params.slug);
 });
 
+// Add coach
+app.post('/admin/teams/:slug/coaches', requireAdmin, (req, res) => {
+  const team = db.prepare('SELECT * FROM teams WHERE slug = ?').get(req.params.slug);
+  if (!team) return res.status(404).send('Team not found');
+  const { coach_name, role } = req.body;
+  if (!coach_name || !coach_name.trim() || !['head', 'assistant'].includes(role)) return res.redirect('/admin/teams/' + req.params.slug);
+  db.prepare('INSERT INTO coaches (team_id, coach_name, role) VALUES (?, ?, ?)').run(team.id, coach_name.trim(), role);
+  res.redirect('/admin/teams/' + req.params.slug);
+});
+
+// Delete coach
+app.post('/admin/teams/:slug/coaches/:id/delete', requireAdmin, (req, res) => {
+  const team = db.prepare('SELECT * FROM teams WHERE slug = ?').get(req.params.slug);
+  if (!team) return res.status(404).send('Team not found');
+  db.prepare('DELETE FROM coaches WHERE id = ? AND team_id = ?').run(req.params.id, team.id);
+  res.redirect('/admin/teams/' + req.params.slug);
+});
+
 // --- Public routes ---
 
 // Public team page
@@ -314,6 +342,7 @@ app.get('/team/:slug', (req, res) => {
   }
 
   const players = db.prepare('SELECT * FROM players WHERE team_id = ? ORDER BY player_name').all(team.id);
+  const coaches = db.prepare('SELECT * FROM coaches WHERE team_id = ? ORDER BY role DESC, coach_name').all(team.id);
   const gameIds = games.map(g => g.id);
   const rsvpSet = new Set();
   if (gameIds.length > 0) {
@@ -326,7 +355,7 @@ app.get('/team/:slug', (req, res) => {
   const ogImage = team.logo_path
     ? req.protocol + '://' + req.get('host') + team.logo_path
     : null;
-  res.render('team-public', { team, games, players, rsvpSet, success: req.query.success, ogImage });
+  res.render('team-public', { team, games, players, coaches, rsvpSet, success: req.query.success, ogImage });
 });
 
 // Snack signup

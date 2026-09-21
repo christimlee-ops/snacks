@@ -34,6 +34,32 @@
 </div>
 
 <div class="card">
+  <h2>Coaches</h2>
+  <form method="POST" action="/admin/teams/<%= team.slug %>/coaches" class="inline-form" style="margin-bottom:1rem">
+    <input type="text" name="coach_name" placeholder="Coach name" required style="flex:1">
+    <select name="role" style="width:auto;flex:none;margin-bottom:0">
+      <option value="head">Head Coach</option>
+      <option value="assistant">Assistant Coach</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Add</button>
+  </form>
+  <% if (coaches.length === 0) { %>
+    <p class="muted">No coaches added yet.</p>
+  <% } else { %>
+    <ul class="player-list">
+      <% for (const coach of coaches) { %>
+        <li>
+          <span><%= coach.coach_name %> <span class="muted" style="font-size:0.8rem"><%= coach.role === 'head' ? 'Head Coach' : 'Assistant Coach' %></span></span>
+          <form method="POST" action="/admin/teams/<%= team.slug %>/coaches/<%= coach.id %>/delete" style="display:inline">
+            <button type="submit" class="btn btn-small btn-danger" onclick="return confirm('Remove this coach?')">Remove</button>
+          </form>
+        </li>
+      <% } %>
+    </ul>
+  <% } %>
+</div>
+
+<div class="card">
   <h2>Add Game</h2>
   <form method="POST" action="/admin/teams/<%= team.slug %>/games" class="game-form">
     <div class="form-row">
