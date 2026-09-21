@@ -596,7 +596,7 @@ input:focus, select:focus {
 
 .rsvp-yes {
   background: #d4edda;
-  color: #155724;
+  color: var(--team-color, #155724);
   border: 2px solid #2d6a4f;
   border-color: var(--team-color, #2d6a4f);
 }
