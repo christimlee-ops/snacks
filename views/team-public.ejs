@@ -39,7 +39,7 @@
               <span style="font-weight:<%= opt.id == votedOptionId ? '700' : '400' %>">
                 <%= opt.option_name %><% if (opt.id == votedOptionId) { %> &#10003;<% } %>
               </span>
-              <span class="muted"><%= pct %>%</span>
+              <span class="muted"><%= opt.vote_count %> vote<%= opt.vote_count !== 1 ? 's' : '' %> &middot; <%= pct %>%</span>
             </div>
             <div style="background:#f0f4f8;border-radius:4px;height:10px;overflow:hidden">
               <div style="background:<%= opt.id == votedOptionId ? '#2d6a4f' : '#74c69d' %>;border-radius:4px;height:10px;width:<%= pct %>%"></div>
