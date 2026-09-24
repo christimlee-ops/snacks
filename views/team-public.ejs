@@ -28,7 +28,7 @@
   <% if (poll) { %>
     <div class="card" style="margin-bottom:1.25rem">
       <h2 style="margin-bottom:0.25rem"><%= poll.title %></h2>
-      <p class="muted" style="margin-bottom:1rem;font-size:0.85rem"><%= pollTotalVotes %> vote<%= pollTotalVotes !== 1 ? 's' : '' %> &middot; <a href="/vote" style="color:#2d6a4f">Cast your vote</a></p>
+      <p class="muted" style="margin-bottom:1rem;font-size:0.85rem"><%= pollTotalVotes %> vote<%= pollTotalVotes !== 1 ? 's' : '' %> &middot; <a href="/team/<%= team.slug %>/vote" style="color:#2d6a4f">Cast your vote</a></p>
       <% if (pollOptions.length === 0) { %>
         <p class="muted">No options yet.</p>
       <% } else { %>
@@ -47,7 +47,7 @@
           </div>
         <% } %>
         <% if (!hasVoted) { %>
-          <a href="/vote" class="btn btn-primary btn-small" style="margin-top:0.25rem">Vote Now</a>
+          <a href="/team/<%= team.slug %>/vote" class="btn btn-primary btn-small" style="margin-top:0.25rem">Vote Now</a>
         <% } %>
       <% } %>
     </div>

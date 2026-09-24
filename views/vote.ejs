@@ -2,6 +2,8 @@
 <%- include('layout') %>
 
 <div style="max-width:580px;margin:0 auto">
+  <a href="/team/<%= team.slug %>" class="back-link">← Back to <%= team.name %></a>
+
   <% if (!poll) { %>
     <div class="card text-center">
       <h2>Voting is not currently open.</h2>
@@ -32,7 +34,7 @@
         <% if (options.length === 0) { %>
           <p class="muted text-center">No options available yet. Check back soon!</p>
         <% } else { %>
-          <form method="POST" action="/vote" id="vote-form">
+          <form method="POST" action="/team/<%= team.slug %>/vote">
             <% for (const opt of options) { %>
               <label class="vote-option-label">
                 <input type="radio" name="option_id" value="<%= opt.id %>" required>

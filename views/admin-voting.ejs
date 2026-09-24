@@ -1,13 +1,13 @@
-<% const title = 'Team Name Voting'; %>
+<% const title = 'Team Name Voting — ' + team.name; %>
 <%- include('layout') %>
 
-<a href="/admin" class="back-link">← Back to Dashboard</a>
+<a href="/admin/teams/<%= team.slug %>" class="back-link">← Back to <%= team.name %></a>
 <h1>Team Name Voting</h1>
 
 <% if (!poll) { %>
 <div class="card">
   <h2>Create Voting Poll</h2>
-  <form method="POST" action="/admin/voting/create" class="inline-form">
+  <form method="POST" action="/admin/teams/<%= team.slug %>/voting/create" class="inline-form">
     <input type="text" name="title" placeholder="Poll title (e.g. Vote for our team name!)" required style="flex:1">
     <button type="submit" class="btn btn-primary">Create Poll</button>
   </form>
@@ -24,18 +24,18 @@
       </div>
     </div>
     <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
-      <form method="POST" action="/admin/voting/toggle">
+      <form method="POST" action="/admin/teams/<%= team.slug %>/voting/toggle">
         <button type="submit" class="btn <%= poll.enabled ? 'btn-outline' : 'btn-primary' %>">
           <%= poll.enabled ? 'Disable' : 'Enable' %>
         </button>
       </form>
-      <a href="/vote" target="_blank" class="btn btn-outline btn-small">View Public Page</a>
-      <form method="POST" action="/admin/voting/reset" onsubmit="return confirm('Reset all votes? This cannot be undone.')">
+      <a href="/team/<%= team.slug %>/vote" target="_blank" class="btn btn-outline btn-small">View Public Page</a>
+      <form method="POST" action="/admin/teams/<%= team.slug %>/voting/reset" onsubmit="return confirm('Reset all votes? This cannot be undone.')">
         <button type="submit" class="btn btn-small" style="color:#dc3545;border-color:#dc3545">Reset Votes</button>
       </form>
     </div>
   </div>
-  <form method="POST" action="/admin/voting/create" class="inline-form" style="margin-top:1rem">
+  <form method="POST" action="/admin/teams/<%= team.slug %>/voting/create" class="inline-form" style="margin-top:1rem">
     <input type="text" name="title" value="<%= poll.title %>" placeholder="Poll title" required style="flex:1">
     <button type="submit" class="btn btn-small">Update Title</button>
   </form>
@@ -43,7 +43,7 @@
 
 <div class="card">
   <h2>Add Name Option</h2>
-  <form method="POST" action="/admin/voting/options" class="inline-form">
+  <form method="POST" action="/admin/teams/<%= team.slug %>/voting/options" class="inline-form">
     <input type="text" name="option_name" placeholder="Team name option (e.g. The Rockets)" required style="flex:1">
     <button type="submit" class="btn btn-primary">Add</button>
   </form>
@@ -61,7 +61,7 @@
           <span style="font-weight:500"><%= opt.option_name %></span>
           <div style="display:flex;align-items:center;gap:0.75rem">
             <span class="muted"><%= opt.vote_count %> vote<%= opt.vote_count !== 1 ? 's' : '' %> &middot; <%= pct %>%</span>
-            <form method="POST" action="/admin/voting/options/<%= opt.id %>/delete" onsubmit="return confirm('Delete this option and its votes?')">
+            <form method="POST" action="/admin/teams/<%= team.slug %>/voting/options/<%= opt.id %>/delete" onsubmit="return confirm('Delete this option and its votes?')">
               <button type="submit" class="btn btn-small" style="color:#dc3545;border-color:#dc3545;padding:0.15rem 0.45rem;font-size:0.8rem">Remove</button>
             </form>
           </div>
