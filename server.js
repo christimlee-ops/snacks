@@ -380,10 +380,23 @@ app.get('/team/:slug', (req, res) => {
     }
   }
 
+  const poll = db.prepare('SELECT * FROM name_poll WHERE enabled = 1 LIMIT 1').get();
+  const pollOptions = poll ? db.prepare(`
+    SELECT o.*, COUNT(v.id) AS vote_count
+    FROM name_poll_options o
+    LEFT JOIN name_poll_votes v ON v.option_id = o.id
+    WHERE o.poll_id = ?
+    GROUP BY o.id
+    ORDER BY vote_count DESC, o.created_at
+  `).all(poll.id) : [];
+  const pollTotalVotes = pollOptions.reduce((sum, o) => sum + o.vote_count, 0);
+  const hasVoted = poll ? !!req.session['voted_' + poll.id] : false;
+  const votedOptionId = poll ? (req.session['voted_option_' + poll.id] || null) : null;
+
   const ogImage = team.logo_path
     ? req.protocol + '://' + req.get('host') + team.logo_path
     : null;
-  res.render('team-public', { team, games, players, coaches, rsvpSet, success: req.query.success, ogImage });
+  res.render('team-public', { team, games, players, coaches, rsvpSet, success: req.query.success, ogImage, poll: poll || null, pollOptions, pollTotalVotes, hasVoted, votedOptionId });
 });
 
 // Permanent GUID-based team URL (redirects to slug URL)

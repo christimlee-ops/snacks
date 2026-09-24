@@ -25,6 +25,34 @@
     <div class="success-msg">Thanks for signing up to bring snacks!</div>
   <% } %>
 
+  <% if (poll) { %>
+    <div class="card" style="margin-bottom:1.25rem">
+      <h2 style="margin-bottom:0.25rem"><%= poll.title %></h2>
+      <p class="muted" style="margin-bottom:1rem;font-size:0.85rem"><%= pollTotalVotes %> vote<%= pollTotalVotes !== 1 ? 's' : '' %> &middot; <a href="/vote" style="color:#2d6a4f">Cast your vote</a></p>
+      <% if (pollOptions.length === 0) { %>
+        <p class="muted">No options yet.</p>
+      <% } else { %>
+        <% for (const opt of pollOptions) { %>
+          <% const pct = pollTotalVotes > 0 ? Math.round(opt.vote_count / pollTotalVotes * 100) : 0; %>
+          <div style="margin-bottom:0.85rem">
+            <div style="display:flex;justify-content:space-between;margin-bottom:0.25rem">
+              <span style="font-weight:<%= opt.id == votedOptionId ? '700' : '400' %>">
+                <%= opt.option_name %><% if (opt.id == votedOptionId) { %> &#10003;<% } %>
+              </span>
+              <span class="muted"><%= pct %>%</span>
+            </div>
+            <div style="background:#f0f4f8;border-radius:4px;height:10px;overflow:hidden">
+              <div style="background:<%= opt.id == votedOptionId ? '#2d6a4f' : '#74c69d' %>;border-radius:4px;height:10px;width:<%= pct %>%"></div>
+            </div>
+          </div>
+        <% } %>
+        <% if (!hasVoted) { %>
+          <a href="/vote" class="btn btn-primary btn-small" style="margin-top:0.25rem">Vote Now</a>
+        <% } %>
+      <% } %>
+    </div>
+  <% } %>
+
   <% if (games.length === 0) { %>
     <p class="muted text-center">No games scheduled yet. Check back soon!</p>
   <% } else { %>
