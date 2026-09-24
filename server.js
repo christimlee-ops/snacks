@@ -57,6 +57,27 @@ db.exec(`CREATE TABLE IF NOT EXISTS rsvps (
   UNIQUE(game_id, player_id)
 )`);
 
+// Voting tables
+db.exec(`CREATE TABLE IF NOT EXISTS name_poll (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title TEXT NOT NULL DEFAULT 'Vote for a Team Name',
+  enabled INTEGER NOT NULL DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+)`);
+db.exec(`CREATE TABLE IF NOT EXISTS name_poll_options (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  poll_id INTEGER NOT NULL REFERENCES name_poll(id) ON DELETE CASCADE,
+  option_name TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+)`);
+db.exec(`CREATE TABLE IF NOT EXISTS name_poll_votes (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  poll_id INTEGER NOT NULL REFERENCES name_poll(id) ON DELETE CASCADE,
+  option_id INTEGER NOT NULL REFERENCES name_poll_options(id) ON DELETE CASCADE,
+  session_id TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+)`);
+
 // Seed default admin if none exists
 const adminExists = db.prepare('SELECT id FROM admin LIMIT 1').get();
 if (!adminExists) {
@@ -117,7 +138,8 @@ function slugify(name) {
 
 // Landing page
 app.get('/', (req, res) => {
-  res.render('landing');
+  const poll = db.prepare('SELECT * FROM name_poll WHERE enabled = 1 LIMIT 1').get();
+  res.render('landing', { poll: poll || null });
 });
 
 // Browse teams
@@ -406,6 +428,100 @@ app.post('/team/:slug/rsvp', (req, res) => {
     db.prepare('INSERT INTO rsvps (game_id, player_id) VALUES (?, ?)').run(game_id, player_id);
   }
   res.redirect('/team/' + req.params.slug + '#game-' + game_id);
+});
+
+// --- Voting routes ---
+
+// Admin: manage voting
+app.get('/admin/voting', requireAdmin, (req, res) => {
+  const poll = db.prepare('SELECT * FROM name_poll ORDER BY id DESC LIMIT 1').get();
+  const options = poll ? db.prepare(`
+    SELECT o.*, COUNT(v.id) AS vote_count
+    FROM name_poll_options o
+    LEFT JOIN name_poll_votes v ON v.option_id = o.id
+    WHERE o.poll_id = ?
+    GROUP BY o.id
+    ORDER BY vote_count DESC, o.created_at
+  `).all(poll.id) : [];
+  const totalVotes = options.reduce((sum, o) => sum + o.vote_count, 0);
+  res.render('admin-voting', { poll: poll || null, options, totalVotes });
+});
+
+// Admin: create or update poll title
+app.post('/admin/voting/create', requireAdmin, (req, res) => {
+  const { title } = req.body;
+  if (!title || !title.trim()) return res.redirect('/admin/voting');
+  const existing = db.prepare('SELECT id FROM name_poll LIMIT 1').get();
+  if (existing) {
+    db.prepare('UPDATE name_poll SET title = ? WHERE id = ?').run(title.trim(), existing.id);
+  } else {
+    db.prepare('INSERT INTO name_poll (title) VALUES (?)').run(title.trim());
+  }
+  res.redirect('/admin/voting');
+});
+
+// Admin: toggle enabled/disabled
+app.post('/admin/voting/toggle', requireAdmin, (req, res) => {
+  const poll = db.prepare('SELECT * FROM name_poll LIMIT 1').get();
+  if (!poll) return res.redirect('/admin/voting');
+  db.prepare('UPDATE name_poll SET enabled = ? WHERE id = ?').run(poll.enabled ? 0 : 1, poll.id);
+  res.redirect('/admin/voting');
+});
+
+// Admin: add option
+app.post('/admin/voting/options', requireAdmin, (req, res) => {
+  const poll = db.prepare('SELECT * FROM name_poll LIMIT 1').get();
+  if (!poll) return res.redirect('/admin/voting');
+  const { option_name } = req.body;
+  if (!option_name || !option_name.trim()) return res.redirect('/admin/voting');
+  db.prepare('INSERT INTO name_poll_options (poll_id, option_name) VALUES (?, ?)').run(poll.id, option_name.trim());
+  res.redirect('/admin/voting');
+});
+
+// Admin: delete option (cascades votes via FK)
+app.post('/admin/voting/options/:id/delete', requireAdmin, (req, res) => {
+  db.prepare('DELETE FROM name_poll_options WHERE id = ?').run(req.params.id);
+  res.redirect('/admin/voting');
+});
+
+// Admin: reset all votes
+app.post('/admin/voting/reset', requireAdmin, (req, res) => {
+  const poll = db.prepare('SELECT * FROM name_poll LIMIT 1').get();
+  if (poll) db.prepare('DELETE FROM name_poll_votes WHERE poll_id = ?').run(poll.id);
+  res.redirect('/admin/voting');
+});
+
+// Public: voting page
+app.get('/vote', (req, res) => {
+  const poll = db.prepare('SELECT * FROM name_poll WHERE enabled = 1 LIMIT 1').get();
+  if (!poll) return res.render('vote', { poll: null, options: [], totalVotes: 0, hasVoted: false, votedOptionId: null });
+  const options = db.prepare(`
+    SELECT o.*, COUNT(v.id) AS vote_count
+    FROM name_poll_options o
+    LEFT JOIN name_poll_votes v ON v.option_id = o.id
+    WHERE o.poll_id = ?
+    GROUP BY o.id
+    ORDER BY vote_count DESC, o.created_at
+  `).all(poll.id);
+  const totalVotes = options.reduce((sum, o) => sum + o.vote_count, 0);
+  const hasVoted = !!req.session['voted_' + poll.id];
+  const votedOptionId = req.session['voted_option_' + poll.id] || null;
+  res.render('vote', { poll, options, totalVotes, hasVoted, votedOptionId });
+});
+
+// Public: submit vote
+app.post('/vote', (req, res) => {
+  const poll = db.prepare('SELECT * FROM name_poll WHERE enabled = 1 LIMIT 1').get();
+  if (!poll) return res.redirect('/vote');
+  if (req.session['voted_' + poll.id]) return res.redirect('/vote');
+  const { option_id } = req.body;
+  if (!option_id) return res.redirect('/vote');
+  const option = db.prepare('SELECT id FROM name_poll_options WHERE id = ? AND poll_id = ?').get(option_id, poll.id);
+  if (!option) return res.redirect('/vote');
+  db.prepare('INSERT INTO name_poll_votes (poll_id, option_id, session_id) VALUES (?, ?, ?)').run(poll.id, option.id, req.session.id);
+  req.session['voted_' + poll.id] = true;
+  req.session['voted_option_' + poll.id] = option.id;
+  res.redirect('/vote');
 });
 
 // --- Start server ---

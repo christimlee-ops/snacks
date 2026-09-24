@@ -197,6 +197,34 @@ input:focus, select:focus {
   font-size: 0.85rem;
 }
 
+/* Vote option labels */
+.vote-option-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  font-weight: normal;
+  font-size: 1rem;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.vote-option-label:hover {
+  border-color: #2d6a4f;
+  background: #f0f9f4;
+}
+
+.vote-option-label input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #2d6a4f;
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
 /* Team grid */
 .team-grid {
   display: grid;

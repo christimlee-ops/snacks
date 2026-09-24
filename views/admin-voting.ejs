@@ -1,0 +1,79 @@
+<% const title = 'Team Name Voting'; %>
+<%- include('layout') %>
+
+<a href="/admin" class="back-link">← Back to Dashboard</a>
+<h1>Team Name Voting</h1>
+
+<% if (!poll) { %>
+<div class="card">
+  <h2>Create Voting Poll</h2>
+  <form method="POST" action="/admin/voting/create" class="inline-form">
+    <input type="text" name="title" placeholder="Poll title (e.g. Vote for our team name!)" required style="flex:1">
+    <button type="submit" class="btn btn-primary">Create Poll</button>
+  </form>
+</div>
+<% } else { %>
+
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.75rem">
+    <div>
+      <h2 style="margin-bottom:0.4rem"><%= poll.title %></h2>
+      <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap">
+        <span class="badge <%= poll.enabled ? 'badge-home' : 'badge-field' %>" style="font-size:0.8rem"><%= poll.enabled ? '● Live' : '○ Disabled' %></span>
+        <span class="muted"><%= totalVotes %> vote<%= totalVotes !== 1 ? 's' : '' %> total</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+      <form method="POST" action="/admin/voting/toggle">
+        <button type="submit" class="btn <%= poll.enabled ? 'btn-outline' : 'btn-primary' %>">
+          <%= poll.enabled ? 'Disable' : 'Enable' %>
+        </button>
+      </form>
+      <a href="/vote" target="_blank" class="btn btn-outline btn-small">View Public Page</a>
+      <form method="POST" action="/admin/voting/reset" onsubmit="return confirm('Reset all votes? This cannot be undone.')">
+        <button type="submit" class="btn btn-small" style="color:#dc3545;border-color:#dc3545">Reset Votes</button>
+      </form>
+    </div>
+  </div>
+  <form method="POST" action="/admin/voting/create" class="inline-form" style="margin-top:1rem">
+    <input type="text" name="title" value="<%= poll.title %>" placeholder="Poll title" required style="flex:1">
+    <button type="submit" class="btn btn-small">Update Title</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>Add Name Option</h2>
+  <form method="POST" action="/admin/voting/options" class="inline-form">
+    <input type="text" name="option_name" placeholder="Team name option (e.g. The Rockets)" required style="flex:1">
+    <button type="submit" class="btn btn-primary">Add</button>
+  </form>
+</div>
+
+<% if (options.length === 0) { %>
+  <p class="muted">No options yet. Add some name options above.</p>
+<% } else { %>
+  <div class="card">
+    <h2>Options &amp; Results</h2>
+    <% for (const opt of options) { %>
+      <% const pct = totalVotes > 0 ? Math.round(opt.vote_count / totalVotes * 100) : 0; %>
+      <div style="margin-bottom:1.25rem">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.3rem">
+          <span style="font-weight:500"><%= opt.option_name %></span>
+          <div style="display:flex;align-items:center;gap:0.75rem">
+            <span class="muted"><%= opt.vote_count %> vote<%= opt.vote_count !== 1 ? 's' : '' %> &middot; <%= pct %>%</span>
+            <form method="POST" action="/admin/voting/options/<%= opt.id %>/delete" onsubmit="return confirm('Delete this option and its votes?')">
+              <button type="submit" class="btn btn-small" style="color:#dc3545;border-color:#dc3545;padding:0.15rem 0.45rem;font-size:0.8rem">Remove</button>
+            </form>
+          </div>
+        </div>
+        <div style="background:#f0f4f8;border-radius:4px;height:10px;overflow:hidden">
+          <div style="background:#2d6a4f;border-radius:4px;height:10px;width:<%= pct %>%"></div>
+        </div>
+      </div>
+    <% } %>
+  </div>
+<% } %>
+
+<% } %>
+
+<%- include('footer') %>

@@ -1,0 +1,50 @@
+<% const title = poll ? poll.title : 'Team Name Vote'; %>
+<%- include('layout') %>
+
+<div style="max-width:580px;margin:0 auto">
+  <% if (!poll) { %>
+    <div class="card text-center">
+      <h2>Voting is not currently open.</h2>
+      <p class="muted" style="margin-top:0.5rem">Check back later!</p>
+    </div>
+  <% } else { %>
+    <div class="card">
+      <h1 class="text-center" style="font-size:1.6rem;margin-bottom:0.3rem"><%= poll.title %></h1>
+      <p class="text-center muted" style="margin-bottom:1.5rem"><%= totalVotes %> vote<%= totalVotes !== 1 ? 's' : '' %> total</p>
+
+      <% if (hasVoted) { %>
+        <div class="success-msg" style="margin-bottom:1.5rem;text-align:center">Thanks for voting!</div>
+        <% for (const opt of options) { %>
+          <% const pct = totalVotes > 0 ? Math.round(opt.vote_count / totalVotes * 100) : 0; %>
+          <div style="margin-bottom:1rem">
+            <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem">
+              <span style="font-weight:<%= opt.id == votedOptionId ? '700' : '400' %>">
+                <%= opt.option_name %><% if (opt.id == votedOptionId) { %> &#10003;<% } %>
+              </span>
+              <span class="muted"><%= opt.vote_count %> &middot; <%= pct %>%</span>
+            </div>
+            <div style="background:#f0f4f8;border-radius:6px;height:14px;overflow:hidden">
+              <div style="background:<%= opt.id == votedOptionId ? '#2d6a4f' : '#74c69d' %>;border-radius:6px;height:14px;width:<%= pct %>%"></div>
+            </div>
+          </div>
+        <% } %>
+      <% } else { %>
+        <% if (options.length === 0) { %>
+          <p class="muted text-center">No options available yet. Check back soon!</p>
+        <% } else { %>
+          <form method="POST" action="/vote" id="vote-form">
+            <% for (const opt of options) { %>
+              <label class="vote-option-label">
+                <input type="radio" name="option_id" value="<%= opt.id %>" required>
+                <span><%= opt.option_name %></span>
+              </label>
+            <% } %>
+            <button type="submit" class="btn btn-primary" style="width:100%;margin-top:1rem;padding:0.75rem;font-size:1.05rem">Submit Vote</button>
+          </form>
+        <% } %>
+      <% } %>
+    </div>
+  <% } %>
+</div>
+
+<%- include('footer') %>
