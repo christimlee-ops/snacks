@@ -56,6 +56,10 @@ db.exec(`CREATE TABLE IF NOT EXISTS rsvps (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(game_id, player_id)
 )`);
+// Migrate: add player position columns if missing
+try { db.exec('ALTER TABLE players ADD COLUMN primary_position TEXT'); } catch (e) { /* already exists */ }
+try { db.exec('ALTER TABLE players ADD COLUMN secondary_position TEXT'); } catch (e) { /* already exists */ }
+try { db.exec('ALTER TABLE teams ADD COLUMN field_format INTEGER DEFAULT 7'); } catch (e) { /* already exists */ }
 
 // Voting tables
 db.exec(`CREATE TABLE IF NOT EXISTS name_poll (
@@ -131,6 +135,43 @@ const upload = multer({
 });
 
 // --- Helpers ---
+const POSITIONS = [
+  { key: 'striker', label: 'Striker' },
+  { key: 'midfield', label: 'Mid Field' },
+  { key: 'defender', label: 'Defender' },
+];
+const POSITION_KEYS = POSITIONS.map(p => p.key);
+const POSITION_ABBR = { striker: 'ST', midfield: 'MF', defender: 'DF' };
+// Spots per position for each field format
+const FORMATIONS = {
+  4: { striker: 1, midfield: 2, defender: 1 },
+  7: { striker: 2, midfield: 3, defender: 2 },
+};
+
+// Fill formation spots with primary-position players first, then secondary; the rest are subs
+function buildLineup(players, format) {
+  const formation = FORMATIONS[format];
+  const used = new Set();
+  const lines = {};
+  for (const pos of POSITION_KEYS) lines[pos] = [];
+  for (const pos of POSITION_KEYS) {
+    for (const p of players) {
+      if (lines[pos].length >= formation[pos]) break;
+      if (!used.has(p.id) && p.primary_position === pos) { lines[pos].push(p); used.add(p.id); }
+    }
+  }
+  for (const pos of POSITION_KEYS) {
+    for (const p of players) {
+      if (lines[pos].length >= formation[pos]) break;
+      if (!used.has(p.id) && p.secondary_position === pos) { lines[pos].push(p); used.add(p.id); }
+    }
+  }
+  for (const pos of POSITION_KEYS) {
+    while (lines[pos].length < formation[pos]) lines[pos].push(null);
+  }
+  const subs = players.filter(p => !used.has(p.id));
+  return { format, lines, subs };
+}
 function slugify(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
@@ -345,6 +386,35 @@ app.post('/admin/teams/:slug/coaches/:id/delete', requireAdmin, (req, res) => {
   res.redirect('/admin/teams/' + req.params.slug);
 });
 
+// --- Player positions (per-team) ---
+
+// Admin: manage player positions
+app.get('/admin/teams/:slug/positions', requireAdmin, (req, res) => {
+  const team = db.prepare('SELECT * FROM teams WHERE slug = ?').get(req.params.slug);
+  if (!team) return res.status(404).send('Team not found');
+  const players = db.prepare('SELECT * FROM players WHERE team_id = ? ORDER BY player_name').all(team.id);
+  res.render('admin-positions', { team, players, positions: POSITIONS, formations: FORMATIONS, saved: req.query.saved });
+});
+
+// Admin: save positions for all players
+app.post('/admin/teams/:slug/positions', requireAdmin, (req, res) => {
+  const team = db.prepare('SELECT * FROM teams WHERE slug = ?').get(req.params.slug);
+  if (!team) return res.status(404).send('Team not found');
+  const format = FORMATIONS[req.body.field_format] ? parseInt(req.body.field_format) : 7;
+  db.prepare('UPDATE teams SET field_format = ? WHERE id = ?').run(format, team.id);
+  const players = db.prepare('SELECT id FROM players WHERE team_id = ?').all(team.id);
+  const update = db.prepare('UPDATE players SET primary_position = ?, secondary_position = ? WHERE id = ? AND team_id = ?');
+  db.transaction(() => {
+    for (const p of players) {
+      const pri = POSITION_KEYS.includes(req.body['primary_' + p.id]) ? req.body['primary_' + p.id] : null;
+      let sec = POSITION_KEYS.includes(req.body['secondary_' + p.id]) ? req.body['secondary_' + p.id] : null;
+      if (sec === pri) sec = null;
+      update.run(pri, sec, p.id, team.id);
+    }
+  })();
+  res.redirect('/admin/teams/' + req.params.slug + '/positions?saved=1');
+});
+
 // --- Public routes ---
 
 // Public team page
@@ -396,7 +466,10 @@ app.get('/team/:slug', (req, res) => {
   const ogImage = team.logo_path
     ? req.protocol + '://' + req.get('host') + team.logo_path
     : null;
-  res.render('team-public', { team, games, players, coaches, rsvpSet, success: req.query.success, ogImage, poll: poll || null, pollOptions, pollTotalVotes, hasVoted, votedOptionId });
+  const lineups = [4, 7].map(f => buildLineup(players, f));
+  const defaultFormat = FORMATIONS[team.field_format] ? team.field_format : 7;
+  const hasPositions = players.some(p => p.primary_position || p.secondary_position);
+  res.render('team-public', { lineups, defaultFormat, hasPositions, positionAbbr: POSITION_ABBR, team, games, players, coaches, rsvpSet, success: req.query.success, ogImage, positions: POSITIONS, poll: poll || null, pollOptions, pollTotalVotes, hasVoted, votedOptionId });
 });
 
 // Permanent GUID-based team URL (redirects to slug URL)

@@ -3,7 +3,10 @@
 
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
   <a href="/admin" class="back-link" style="margin-bottom:0">&larr; All Teams</a>
-  <a href="/admin/teams/<%= team.slug %>/voting" class="btn btn-outline btn-small">Team Name Voting</a>
+  <div style="display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:flex-end">
+    <a href="/admin/teams/<%= team.slug %>/positions" class="btn btn-outline btn-small">Player Positions</a>
+    <a href="/admin/teams/<%= team.slug %>/voting" class="btn btn-outline btn-small">Team Name Voting</a>
+  </div>
 </div>
 
 <div class="team-header">
