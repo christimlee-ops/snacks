@@ -21,7 +21,7 @@
         <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer">
           <input type="radio" name="field_format" value="<%= f %>" <%= (team.field_format || 7) == f ? 'checked' : '' %>>
           <strong><%= f %> Players</strong>
-          <span class="muted">(<%= fm.striker %> ST · <%= fm.midfield %> MF · <%= fm.defender %> DF)</span>
+          <span class="muted">(<%= Object.keys(fm).map(k => fm[k] + ' ' + positionAbbr[k]).join(' · ') %>)</span>
         </label>
       <% } %>
     </div>

@@ -118,7 +118,6 @@
           <% } %>
         </div>
       </div>
-      <% const posLabels = { striker: 'Striker', midfield: 'Mid Field', defender: 'Defender' }; %>
       <% for (const lu of lineups) { %>
         <div class="field-view" data-format="<%= lu.format %>" <%= lu.format == defaultFormat ? '' : 'hidden' %>>
           <div class="soccer-field">
@@ -126,9 +125,9 @@
             <div class="field-center-line"></div>
             <div class="field-center-circle"></div>
             <div class="field-goal-box field-goal-bottom"></div>
-            <% for (const pos of ['striker', 'midfield', 'defender']) { %>
+            <% for (const pos of Object.keys(lu.lines)) { %>
               <div class="field-line">
-                <span class="field-line-label"><%= posLabels[pos] %></span>
+                <span class="field-line-label"><%= positionLabels[pos] %></span>
                 <div class="field-spots">
                   <% for (const p of lu.lines[pos]) { %>
                     <% if (p) { %>
@@ -160,7 +159,7 @@
           <% } %>
         </div>
       <% } %>
-      <p class="muted field-legend">Primary / Secondary &middot; ST Striker &middot; MF Mid Field &middot; DF Defender &middot; dashed = playing secondary position</p>
+      <p class="muted field-legend">Primary / Secondary &middot; <%= Object.keys(positionAbbr).map(k => positionAbbr[k] + ' ' + positionLabels[k]).join(' · ') %> &middot; dashed = playing secondary position</p>
     </div>
   <% } %>
 </div>
