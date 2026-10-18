@@ -771,17 +771,12 @@ input:focus, select:focus {
 .field-player-dot { width: 26px; height: 26px; border-radius: 50%; background: var(--team-color, #2d6a4f); border: 3px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.35); }
 .field-player-name { margin-top: 0.2rem; padding: 0.1rem 0.45rem; border-radius: 4px; background: rgba(0,0,0,0.55); color: #fff; font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 .field-player .field-player-pos { margin-top: 0.15rem; font-size: 0.68rem; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.6); }
-.field-player-secondary .field-player-dot { border-style: dashed; background: #fff; border-color: var(--team-color, #2d6a4f); }
-.field-player-open .field-player-dot { background: transparent; border-style: dashed; }
-.field-player-open .field-player-name { background: transparent; color: rgba(255,255,255,0.8); font-weight: 400; }
 
 .field-subs { margin-top: 0.85rem; }
 .field-subs h4 { margin-bottom: 0.4rem; }
 .field-subs-list { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 .field-sub { background: #f0f4f8; border-radius: 4px; padding: 0.2rem 0.5rem; font-size: 0.85rem; }
 .field-sub .field-player-pos { color: #6c757d; font-size: 0.75rem; }
-.fields-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
-.field-title { margin-bottom: 0.5rem; }
 .field-line-empty { font-size: 0.8rem; color: rgba(255,255,255,0.75); font-style: italic; }
 .field-legend { font-size: 0.75rem; margin-top: 0.75rem; }
 

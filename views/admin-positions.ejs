@@ -13,21 +13,6 @@
 <% } else { %>
 <form method="POST" action="/admin/teams/<%= team.slug %>/positions">
   <div class="card">
-    <h2>Field Format</h2>
-    <p class="muted" style="margin-bottom:0.75rem">The lineup shown on the public team page. The full team is shown alongside it.</p>
-    <div style="display:flex;gap:1.25rem;flex-wrap:wrap">
-      <% for (const f of [4, 7]) { %>
-        <% const fm = formations[f]; %>
-        <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer">
-          <input type="radio" name="field_format" value="<%= f %>" <%= (team.field_format || 7) == f ? 'checked' : '' %>>
-          <strong><%= f %> Players</strong>
-          <span class="muted">(<%= Object.keys(fm).map(k => fm[k] + ' ' + positionAbbr[k]).join(' · ') %>)</span>
-        </label>
-      <% } %>
-    </div>
-  </div>
-
-  <div class="card">
     <h2>Positions</h2>
     <table class="positions-table">
       <thead>

@@ -1,5 +1,4 @@
 <div class="field-view">
-  <h3 class="field-title"><%= fieldTitle %></h3>
   <div class="soccer-field">
     <div class="field-goal-box field-goal-top"></div>
     <div class="field-center-line"></div>
@@ -13,18 +12,11 @@
             <span class="field-line-empty">None</span>
           <% } %>
           <% for (const p of lines[pos]) { %>
-            <% if (p) { %>
-              <div class="field-player <%= p.primary_position === pos ? '' : 'field-player-secondary' %>">
-                <span class="field-player-dot"></span>
-                <span class="field-player-name"><%= p.player_name %></span>
-                <span class="field-player-pos"><%= p.primary_position ? positionAbbr[p.primary_position] : '—' %> / <%= p.secondary_position ? positionAbbr[p.secondary_position] : '—' %></span>
-              </div>
-            <% } else { %>
-              <div class="field-player field-player-open">
-                <span class="field-player-dot"></span>
-                <span class="field-player-name">Open</span>
-              </div>
-            <% } %>
+            <div class="field-player">
+              <span class="field-player-dot"></span>
+              <span class="field-player-name"><%= p.player_name %></span>
+              <span class="field-player-pos"><%= positionAbbr[p.primary_position] %> / <%= p.secondary_position ? positionAbbr[p.secondary_position] : '—' %></span>
+            </div>
           <% } %>
         </div>
       </div>

@@ -59,7 +59,6 @@ db.exec(`CREATE TABLE IF NOT EXISTS rsvps (
 // Migrate: add player position columns if missing
 try { db.exec('ALTER TABLE players ADD COLUMN primary_position TEXT'); } catch (e) { /* already exists */ }
 try { db.exec('ALTER TABLE players ADD COLUMN secondary_position TEXT'); } catch (e) { /* already exists */ }
-try { db.exec('ALTER TABLE teams ADD COLUMN field_format INTEGER DEFAULT 7'); } catch (e) { /* already exists */ }
 
 // Voting tables
 db.exec(`CREATE TABLE IF NOT EXISTS name_poll (
@@ -144,33 +143,6 @@ const POSITIONS = [
 const POSITION_KEYS = POSITIONS.map(p => p.key);
 const POSITION_LABELS = Object.fromEntries(POSITIONS.map(p => [p.key, p.label]));
 const POSITION_ABBR = { striker: 'ST', midfield: 'MF', defender: 'DF', goalie: 'GK' };
-// Spots per position for each field format, listed top (attack) to bottom (own goal)
-const FORMATIONS = {
-  4: { striker: 2, midfield: 1, defender: 1 },
-  7: { striker: 3, defender: 3, goalie: 1 },
-};
-
-// Fill formation spots with primary-position players first, then secondary; the rest are subs
-function buildLineup(players, format) {
-  const formation = FORMATIONS[format];
-  const lineKeys = Object.keys(formation);
-  const used = new Set();
-  const lines = {};
-  for (const pos of lineKeys) lines[pos] = [];
-  for (const field of ['primary_position', 'secondary_position']) {
-    for (const pos of lineKeys) {
-      for (const p of players) {
-        if (lines[pos].length >= formation[pos]) break;
-        if (!used.has(p.id) && p[field] === pos) { lines[pos].push(p); used.add(p.id); }
-      }
-    }
-  }
-  for (const pos of lineKeys) {
-    while (lines[pos].length < formation[pos]) lines[pos].push(null);
-  }
-  const subs = players.filter(p => !used.has(p.id));
-  return { format, lines, subs };
-}
 function slugify(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
@@ -392,15 +364,13 @@ app.get('/admin/teams/:slug/positions', requireAdmin, (req, res) => {
   const team = db.prepare('SELECT * FROM teams WHERE slug = ?').get(req.params.slug);
   if (!team) return res.status(404).send('Team not found');
   const players = db.prepare('SELECT * FROM players WHERE team_id = ? ORDER BY player_name').all(team.id);
-  res.render('admin-positions', { team, players, positions: POSITIONS, formations: FORMATIONS, positionAbbr: POSITION_ABBR, saved: req.query.saved });
+  res.render('admin-positions', { team, players, positions: POSITIONS, saved: req.query.saved });
 });
 
 // Admin: save positions for all players
 app.post('/admin/teams/:slug/positions', requireAdmin, (req, res) => {
   const team = db.prepare('SELECT * FROM teams WHERE slug = ?').get(req.params.slug);
   if (!team) return res.status(404).send('Team not found');
-  const format = FORMATIONS[req.body.field_format] ? parseInt(req.body.field_format) : 7;
-  db.prepare('UPDATE teams SET field_format = ? WHERE id = ?').run(format, team.id);
   const players = db.prepare('SELECT id FROM players WHERE team_id = ?').all(team.id);
   const update = db.prepare('UPDATE players SET primary_position = ?, secondary_position = ? WHERE id = ? AND team_id = ?');
   db.transaction(() => {
@@ -465,12 +435,11 @@ app.get('/team/:slug', (req, res) => {
   const ogImage = team.logo_path
     ? req.protocol + '://' + req.get('host') + team.logo_path
     : null;
-  const lineup = buildLineup(players, FORMATIONS[team.field_format] ? team.field_format : 7);
   // Entire roster by primary position, top (attack) to bottom (own goal)
   const fullTeam = { lines: {}, unassigned: players.filter(p => !POSITION_KEYS.includes(p.primary_position)) };
   for (const pos of POSITION_KEYS) fullTeam.lines[pos] = players.filter(p => p.primary_position === pos);
   const hasPositions = players.some(p => p.primary_position || p.secondary_position);
-  res.render('team-public', { lineup, fullTeam, hasPositions, positionAbbr: POSITION_ABBR, positionLabels: POSITION_LABELS, team, games, players, coaches, rsvpSet, success: req.query.success, ogImage, positions: POSITIONS, poll: poll || null, pollOptions, pollTotalVotes, hasVoted, votedOptionId });
+  res.render('team-public', { fullTeam, hasPositions, positionAbbr: POSITION_ABBR, positionLabels: POSITION_LABELS, team, games, players, coaches, rsvpSet, success: req.query.success, ogImage, positions: POSITIONS, poll: poll || null, pollOptions, pollTotalVotes, hasVoted, votedOptionId });
 });
 
 // Permanent GUID-based team URL (redirects to slug URL)

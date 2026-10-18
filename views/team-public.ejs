@@ -110,12 +110,9 @@
 
   <% if (hasPositions) { %>
     <div class="card positions-card" id="positions">
-      <h2>Positions</h2>
-      <div class="fields-grid">
-        <%- include('soccer-field', { fieldTitle: lineup.format + '-Player Lineup', lines: lineup.lines, subs: lineup.subs, subsTitle: 'Subs' }) %>
-        <%- include('soccer-field', { fieldTitle: 'Full Team', lines: fullTeam.lines, subs: fullTeam.unassigned, subsTitle: 'No Position Yet' }) %>
-      </div>
-      <p class="muted field-legend">Primary / Secondary &middot; <%= Object.keys(positionAbbr).map(k => positionAbbr[k] + ' ' + positionLabels[k]).join(' · ') %> &middot; dashed = playing secondary position</p>
+      <h2>Full Team</h2>
+      <%- include('soccer-field', { lines: fullTeam.lines, subs: fullTeam.unassigned, subsTitle: 'No Position Yet' }) %>
+      <p class="muted field-legend">Primary / Secondary &middot; <%= Object.keys(positionAbbr).map(k => positionAbbr[k] + ' ' + positionLabels[k]).join(' · ') %></p>
     </div>
   <% } %>
 </div>
