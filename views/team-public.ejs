@@ -110,68 +110,17 @@
 
   <% if (hasPositions) { %>
     <div class="card positions-card" id="positions">
-      <div class="positions-header">
-        <h2 style="margin:0">Positions</h2>
-        <div class="format-toggle">
-          <% for (const lu of lineups) { %>
-            <button type="button" class="format-btn <%= lu.format == defaultFormat ? 'active' : '' %>" data-format="<%= lu.format %>"><%= lu.format %> Players</button>
-          <% } %>
-        </div>
+      <h2>Positions</h2>
+      <div class="fields-grid">
+        <%- include('soccer-field', { fieldTitle: lineup.format + '-Player Lineup', lines: lineup.lines, subs: lineup.subs, subsTitle: 'Subs' }) %>
+        <%- include('soccer-field', { fieldTitle: 'Full Team', lines: fullTeam.lines, subs: fullTeam.unassigned, subsTitle: 'No Position Yet' }) %>
       </div>
-      <% for (const lu of lineups) { %>
-        <div class="field-view" data-format="<%= lu.format %>" <%= lu.format == defaultFormat ? '' : 'hidden' %>>
-          <div class="soccer-field">
-            <div class="field-goal-box field-goal-top"></div>
-            <div class="field-center-line"></div>
-            <div class="field-center-circle"></div>
-            <div class="field-goal-box field-goal-bottom"></div>
-            <% for (const pos of Object.keys(lu.lines)) { %>
-              <div class="field-line">
-                <span class="field-line-label"><%= positionLabels[pos] %></span>
-                <div class="field-spots">
-                  <% for (const p of lu.lines[pos]) { %>
-                    <% if (p) { %>
-                      <div class="field-player <%= p.primary_position === pos ? '' : 'field-player-secondary' %>">
-                        <span class="field-player-dot"></span>
-                        <span class="field-player-name"><%= p.player_name %></span>
-                        <span class="field-player-pos"><%= p.primary_position ? positionAbbr[p.primary_position] : '—' %> / <%= p.secondary_position ? positionAbbr[p.secondary_position] : '—' %></span>
-                      </div>
-                    <% } else { %>
-                      <div class="field-player field-player-open">
-                        <span class="field-player-dot"></span>
-                        <span class="field-player-name">Open</span>
-                      </div>
-                    <% } %>
-                  <% } %>
-                </div>
-              </div>
-            <% } %>
-          </div>
-          <% if (lu.subs.length > 0) { %>
-            <div class="field-subs">
-              <h4>Subs</h4>
-              <div class="field-subs-list">
-                <% for (const p of lu.subs) { %>
-                  <span class="field-sub"><%= p.player_name %> <span class="field-player-pos"><%= p.primary_position ? positionAbbr[p.primary_position] : '—' %> / <%= p.secondary_position ? positionAbbr[p.secondary_position] : '—' %></span></span>
-                <% } %>
-              </div>
-            </div>
-          <% } %>
-        </div>
-      <% } %>
       <p class="muted field-legend">Primary / Secondary &middot; <%= Object.keys(positionAbbr).map(k => positionAbbr[k] + ' ' + positionLabels[k]).join(' · ') %> &middot; dashed = playing secondary position</p>
     </div>
   <% } %>
 </div>
 
 <script>
-document.querySelectorAll('.format-btn').forEach(function(btn) {
-  btn.addEventListener('click', function() {
-    var f = btn.getAttribute('data-format');
-    document.querySelectorAll('.format-btn').forEach(function(b) { b.classList.toggle('active', b === btn); });
-    document.querySelectorAll('.field-view').forEach(function(v) { v.hidden = v.getAttribute('data-format') !== f; });
-  });
-});
 (function() {
   var today = new Date();
   today.setHours(0, 0, 0, 0);

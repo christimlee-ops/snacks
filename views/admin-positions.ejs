@@ -14,7 +14,7 @@
 <form method="POST" action="/admin/teams/<%= team.slug %>/positions">
   <div class="card">
     <h2>Field Format</h2>
-    <p class="muted" style="margin-bottom:0.75rem">The default field shown on the public team page. Visitors can switch between both formats.</p>
+    <p class="muted" style="margin-bottom:0.75rem">The lineup shown on the public team page. The full team is shown alongside it.</p>
     <div style="display:flex;gap:1.25rem;flex-wrap:wrap">
       <% for (const f of [4, 7]) { %>
         <% const fm = formations[f]; %>

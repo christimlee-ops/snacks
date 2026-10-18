@@ -465,10 +465,12 @@ app.get('/team/:slug', (req, res) => {
   const ogImage = team.logo_path
     ? req.protocol + '://' + req.get('host') + team.logo_path
     : null;
-  const lineups = [4, 7].map(f => buildLineup(players, f));
-  const defaultFormat = FORMATIONS[team.field_format] ? team.field_format : 7;
+  const lineup = buildLineup(players, FORMATIONS[team.field_format] ? team.field_format : 7);
+  // Entire roster by primary position, top (attack) to bottom (own goal)
+  const fullTeam = { lines: {}, unassigned: players.filter(p => !POSITION_KEYS.includes(p.primary_position)) };
+  for (const pos of POSITION_KEYS) fullTeam.lines[pos] = players.filter(p => p.primary_position === pos);
   const hasPositions = players.some(p => p.primary_position || p.secondary_position);
-  res.render('team-public', { lineups, defaultFormat, hasPositions, positionAbbr: POSITION_ABBR, positionLabels: POSITION_LABELS, team, games, players, coaches, rsvpSet, success: req.query.success, ogImage, positions: POSITIONS, poll: poll || null, pollOptions, pollTotalVotes, hasVoted, votedOptionId });
+  res.render('team-public', { lineup, fullTeam, hasPositions, positionAbbr: POSITION_ABBR, positionLabels: POSITION_LABELS, team, games, players, coaches, rsvpSet, success: req.query.success, ogImage, positions: POSITIONS, poll: poll || null, pollOptions, pollTotalVotes, hasVoted, votedOptionId });
 });
 
 // Permanent GUID-based team URL (redirects to slug URL)

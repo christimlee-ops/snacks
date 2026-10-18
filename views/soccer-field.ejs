@@ -1,0 +1,43 @@
+<div class="field-view">
+  <h3 class="field-title"><%= fieldTitle %></h3>
+  <div class="soccer-field">
+    <div class="field-goal-box field-goal-top"></div>
+    <div class="field-center-line"></div>
+    <div class="field-center-circle"></div>
+    <div class="field-goal-box field-goal-bottom"></div>
+    <% for (const pos of Object.keys(lines)) { %>
+      <div class="field-line">
+        <span class="field-line-label"><%= positionLabels[pos] %></span>
+        <div class="field-spots">
+          <% if (lines[pos].length === 0) { %>
+            <span class="field-line-empty">None</span>
+          <% } %>
+          <% for (const p of lines[pos]) { %>
+            <% if (p) { %>
+              <div class="field-player <%= p.primary_position === pos ? '' : 'field-player-secondary' %>">
+                <span class="field-player-dot"></span>
+                <span class="field-player-name"><%= p.player_name %></span>
+                <span class="field-player-pos"><%= p.primary_position ? positionAbbr[p.primary_position] : '—' %> / <%= p.secondary_position ? positionAbbr[p.secondary_position] : '—' %></span>
+              </div>
+            <% } else { %>
+              <div class="field-player field-player-open">
+                <span class="field-player-dot"></span>
+                <span class="field-player-name">Open</span>
+              </div>
+            <% } %>
+          <% } %>
+        </div>
+      </div>
+    <% } %>
+  </div>
+  <% if (subs.length > 0) { %>
+    <div class="field-subs">
+      <h4><%= subsTitle %></h4>
+      <div class="field-subs-list">
+        <% for (const p of subs) { %>
+          <span class="field-sub"><%= p.player_name %> <span class="field-player-pos"><%= p.primary_position ? positionAbbr[p.primary_position] : '—' %> / <%= p.secondary_position ? positionAbbr[p.secondary_position] : '—' %></span></span>
+        <% } %>
+      </div>
+    </div>
+  <% } %>
+</div>
