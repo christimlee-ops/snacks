@@ -146,7 +146,7 @@ const POSITION_LABELS = Object.fromEntries(POSITIONS.map(p => [p.key, p.label]))
 const POSITION_ABBR = { striker: 'ST', midfield: 'MF', defender: 'DF', goalie: 'GK' };
 // Spots per position for each field format, listed top (attack) to bottom (own goal)
 const FORMATIONS = {
-  4: { striker: 1, midfield: 2, defender: 1 },
+  4: { striker: 2, midfield: 1, defender: 1 },
   7: { striker: 3, defender: 3, goalie: 1 },
 };
 
